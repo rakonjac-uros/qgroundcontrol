@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 72 72"
+   style="enable-background:new 0 0 72 72;"
+   xml:space="preserve"
+   sodipodi:docname="payload_armed.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+   id="metadata13"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs11" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="2560"
+   inkscape:window-height="1376"
+   id="namedview9"
+   showgrid="false"
+   inkscape:zoom="3.2777778"
+   inkscape:cx="12.050847"
+   inkscape:cy="60.40678"
+   inkscape:window-x="0"
+   inkscape:window-y="27"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<style
+   type="text/css"
+   id="style2">
+	.st0{fill:#66BD59;stroke:#FFFFFF;stroke-width:5;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#FFFFFF;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<path
+   d="M 36 3.5996094 A 32.400002 32.400002 0 0 0 3.5996094 36 A 32.400002 32.400002 0 0 0 36 68.400391 A 32.400002 32.400002 0 0 0 68.400391 36 A 32.400002 32.400002 0 0 0 36 3.5996094 z M 51.212891 17.519531 C 51.842304 17.49704 52.491051 17.761616 53.011719 18.316406 C 54.053054 19.425988 54.17493 21.266796 53.287109 22.445312 L 29.861328 53.542969 C 29.369275 54.196133 28.673026 54.491169 27.972656 54.447266 C 27.102512 54.571186 26.184327 54.146532 25.605469 53.226562 L 18.636719 42.150391 C 17.800714 40.821745 17.998656 39.008521 19.082031 38.083984 C 20.165405 37.159446 21.71087 37.483854 22.546875 38.8125 L 27.841797 47.228516 L 49.529297 18.439453 C 49.973207 17.850195 50.583478 17.542022 51.212891 17.519531 z "
+   id="circle4"
+   style="fill:#008000" />
+
+</svg>

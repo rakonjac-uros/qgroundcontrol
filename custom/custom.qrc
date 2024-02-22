@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="custom/img">
+        <file alias="attitude_crosshair.svg">res/Images/attitude_crosshair.svg</file>
+        <file alias="attitude_dial.svg">res/Images/attitude_dial.svg</file>
+        <file alias="attitude_pointer.svg">res/Images/attitude_pointer.svg</file>
+        <file alias="compass_needle.svg">res/Images/compass_needle.svg</file>
+        <file alias="compass_pointer.svg">res/Images/compass_pointer.svg</file>
+        <file alias="payload_armed.svg">res/Images/payload_armed.svg</file>
+        <file alias="payload_disarmed.svg">res/Images/payload_disarmed.svg</file>
+    </qresource>
+    <qresource prefix="Custom/Widgets">
+        <file alias="Custom/Widgets/CustomActionConfirm.qml">res/Custom/Widgets/CustomActionConfirm.qml</file>
+        <file alias="Custom/Widgets/CustomArtificialHorizon.qml">res/Custom/Widgets/CustomArtificialHorizon.qml</file>
+        <file alias="Custom/Widgets/CustomAttitudeWidget.qml">res/Custom/Widgets/CustomAttitudeWidget.qml</file>
+        <file alias="Custom/Widgets/qmldir">res/Custom/Widgets/qmldir</file>
+    </qresource>
+    <qresource prefix="/qml">
+        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">res/CustomFlyViewOverlay.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlyViewToolStrip.qml">src/FlightDisplay/CustomFlyViewToolStrip.qml</file>
+        <file alias="PlanView.qml">src/PlanView/CustomPlanView.qml</file>
+    </qresource>
+    <qresource prefix="/toolbar">
+        <file alias="MultiVehicleSelector.qml">src/ui/toolbar/CustomMultiVehicleSelector.qml</file>
+    </qresource>
+    <qresource prefix="/json">
+        <file alias="Vehicle/EngineFact.json">src/Vehicle/CustomEngineFact.json</file>
+    </qresource>
+    <qresource prefix="/res">
+        <file alias="QGCLogoBlack">res/Images/QGCLogoBlack.svg</file>
+		<file alias="QGCLogoFull">res/Images/QGCLogoFull.svg</file>
+        <file alias="QGCLogoWhite">res/Images/QGCLogoWhite.svg</file>
+    </qresource>
+</RCC>

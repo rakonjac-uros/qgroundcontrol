@@ -87,6 +87,48 @@ class ParsedEvent;
 
 Q_DECLARE_LOGGING_CATEGORY(VehicleLog)
 
+class VehicleEngineFactGroup : public FactGroup
+{
+    Q_OBJECT
+
+public:
+    VehicleEngineFactGroup(QObject* parent = nullptr);
+
+    // payload: boat underway status lisght "underway_threshold", steering state), 1 no 2 yes
+    // engine gear, "gear", gear (number that relates to F/N/R)
+    // rudder "rudder_angle", rudder_angle_float
+    // steering status ""steer_thr_state", steering_State, 1: steer/thr both manual, 2 steer auro th manual, 3 steering manual th auto, 4 both auto
+    //
+    Q_PROPERTY(Fact* underway_threshold       READ underway_threshold       CONSTANT)
+    Q_PROPERTY(Fact* gear       READ gear       CONSTANT)
+    Q_PROPERTY(Fact* rudder_angle       READ rudder_angle       CONSTANT)
+    Q_PROPERTY(Fact* steer_thr_state       READ steer_thr_state       CONSTANT)
+    Q_PROPERTY(Fact* throttle_pos       READ throttle_pos       CONSTANT)
+
+    Fact* underway_threshold () { return &_underway_thresholdFact; }
+    Fact* gear () { return &_gearFact; }
+    Fact* rudder_angle () { return &_rudder_angleFact; }
+    Fact* steer_thr_state () { return &_steer_thr_stateFact; }
+    Fact* throttle_pos () { return &_throttle_posFact; }
+
+    static const char* _underway_thresholdFactName;
+    static const char* _gearFactName;
+    static const char* _rudder_angleFactName;
+    static const char* _steer_thr_stateFactName;
+    static const char* _throttle_posFactName;
+
+    static const char* _settingsGroup;
+
+    static const double _engineUnavailable;
+
+private:
+    Fact            _underway_thresholdFact;
+    Fact            _gearFact;
+    Fact            _rudder_angleFact;
+    Fact            _steer_thr_stateFact;
+    Fact            _throttle_posFact;
+};
+
 class Vehicle : public FactGroup
 {
     Q_OBJECT
@@ -327,6 +369,7 @@ public:
     Q_PROPERTY(FactGroup*           hygrometer      READ hygrometerFactGroup        CONSTANT)
     Q_PROPERTY(FactGroup*           generator       READ generatorFactGroup         CONSTANT)
     Q_PROPERTY(FactGroup*           efi             READ efiFactGroup               CONSTANT)
+    Q_PROPERTY(FactGroup*           engine          READ engineFactGroup            CONSTANT)
     Q_PROPERTY(QmlObjectListModel*  batteries       READ batteries                  CONSTANT)
     Q_PROPERTY(Actuators*           actuators       READ actuators                  CONSTANT)
     Q_PROPERTY(HealthAndArmingCheckReport* healthAndArmingCheckReport READ healthAndArmingCheckReport CONSTANT)
@@ -721,6 +764,7 @@ public:
     FactGroup* hygrometerFactGroup          () { return &_hygrometerFactGroup; }
     FactGroup* generatorFactGroup           () { return &_generatorFactGroup; }
     FactGroup* efiFactGroup                 () { return &_efiFactGroup; }
+    FactGroup* engineFactGroup              () { return &_engineFactGroup; }
     QmlObjectListModel* batteries           () { return &_batteryFactGroupListModel; }
 
     MissionManager*                 missionManager      () { return _missionManager; }
@@ -1092,6 +1136,8 @@ private:
     void _handleObstacleDistance        (const mavlink_message_t& message);
     void _handleFenceStatus             (const mavlink_message_t& message);
     void _handleEvent(uint8_t comp_id, std::unique_ptr<events::parser::ParsedEvent> event);
+    void _handleNamedValue        (const mavlink_message_t& message);
+    void _handleEFIStatus        (const mavlink_message_t& message);
     // ArduPilot dialect messages
 #if !defined(NO_ARDUPILOT_DIALECT)
     void _handleCameraFeedback          (const mavlink_message_t& message);
@@ -1428,6 +1474,7 @@ private:
     VehicleHygrometerFactGroup      _hygrometerFactGroup;
     VehicleGeneratorFactGroup       _generatorFactGroup;
     VehicleEFIFactGroup             _efiFactGroup;
+    VehicleEngineFactGroup          _engineFactGroup;
     TerrainFactGroup                _terrainFactGroup;
     QmlObjectListModel              _batteryFactGroupListModel;
 
@@ -1489,6 +1536,7 @@ private:
     static const char* _generatorFactGroupName;
     static const char* _efiFactGroupName;
     static const char* _terrainFactGroupName;
+    static const char* _engineFactGroupName;
 
     static const int _vehicleUIUpdateRateMSecs      = 100;
 

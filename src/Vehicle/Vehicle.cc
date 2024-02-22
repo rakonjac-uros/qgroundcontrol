@@ -115,6 +115,7 @@ const char* Vehicle::_terrainFactGroupName =            "terrain";
 const char* Vehicle::_hygrometerFactGroupName =         "hygrometer";
 const char* Vehicle::_generatorFactGroupName =          "generator";
 const char* Vehicle::_efiFactGroupName =                "efi";
+const char* Vehicle::_engineFactGroupName =             "engine";
 
 // Standard connected vehicle
 Vehicle::Vehicle(LinkInterface*             link,
@@ -182,6 +183,7 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _efiFactGroup                 (this)
     , _terrainFactGroup             (this)
     , _terrainProtocolHandler       (new TerrainProtocolHandler(this, &_terrainFactGroup, this))
+    , _engineFactGroup              (this)
 {
     _linkManager = _toolbox->linkManager();
 
@@ -472,6 +474,7 @@ void Vehicle::_commonInit()
     _addFactGroup(&_generatorFactGroup,         _generatorFactGroupName);
     _addFactGroup(&_efiFactGroup,               _efiFactGroupName);
     _addFactGroup(&_terrainFactGroup,           _terrainFactGroupName);
+    _addFactGroup(&_engineFactGroup,            _engineFactGroupName);
 
     // Add firmware-specific fact groups, if provided
     QMap<QString, FactGroup*>* fwFactGroups = _firmwarePlugin->factGroups();
@@ -762,6 +765,12 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_FENCE_STATUS:
         _handleFenceStatus(message);
+        break;
+    case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
+        _handleNamedValue(message);
+        break;
+    case MAVLINK_MSG_ID_EFI_STATUS:
+        _handleEFIStatus(message);
         break;
 
     case MAVLINK_MSG_ID_EVENT:
@@ -4336,6 +4345,62 @@ void Vehicle::_handleObstacleDistance(const mavlink_message_t& message)
     _objectAvoidance->update(&o);
 }
 
+void Vehicle::_handleNamedValue(const mavlink_message_t& message)
+{
+    mavlink_named_value_float_t o;
+    mavlink_msg_named_value_float_decode(&message, &o);
+    //std::string value_name(&o.name.toString());
+    printf("RECV named_value %s %.2f\n", o.name, o.value);
+    if (strncmp(o.name, "underway_t", 4) == 0)
+    {
+        _engineFactGroup.underway_threshold()->setRawValue(o.value);
+    }
+    else if (strncmp(o.name, "gear", 4) == 0)
+    {
+        _engineFactGroup.gear()->setRawValue(o.value);
+    }
+    else if (strncmp(o.name, "thr_pos_pc", 4) == 0)
+    {
+        _engineFactGroup.throttle_pos()->setRawValue(o.value);
+    }
+    else if (strncmp(o.name, "rudder_ang", 4) == 0)
+    {
+        _engineFactGroup.rudder_angle()->setRawValue(o.value);
+    }
+    else if (strncmp(o.name, "steer_thr_", 4) == 0)
+    {
+        _engineFactGroup.steer_thr_state()->setRawValue(o.value);
+    }
+    else /* default: */
+    {
+        printf("error assigning named values\n");
+    }
+}
+
+void Vehicle::_handleEFIStatus(const mavlink_message_t& message)
+{
+    mavlink_efi_status_t efi;
+    mavlink_msg_efi_status_decode(&message, &efi);
+
+    _efiFactGroup.health()->setRawValue           (efi.health == INT8_MAX ? qQNaN() : efi.health);
+    _efiFactGroup.ecuIndex()->setRawValue         (efi.ecu_index);
+    _efiFactGroup.rpm()->setRawValue              (efi.rpm);
+    _efiFactGroup.fuelConsumed()->setRawValue     (efi.fuel_consumed);
+    _efiFactGroup.fuelFlow()->setRawValue         (efi.fuel_flow);
+    _efiFactGroup.engineLoad()->setRawValue       (efi.engine_load);
+    _efiFactGroup.throttlePos()->setRawValue      (efi.throttle_position);
+    _efiFactGroup.sparkTime()->setRawValue        (efi.spark_dwell_time);
+    _efiFactGroup.baroPress()->setRawValue        (efi.barometric_pressure);
+    _efiFactGroup.intakePress()->setRawValue      (efi.intake_manifold_pressure);
+    _efiFactGroup.intakeTemp()->setRawValue       (efi.intake_manifold_temperature);
+    _efiFactGroup.cylinderTemp()->setRawValue     (efi.cylinder_head_temperature);
+    _efiFactGroup.ignTime()->setRawValue          (efi.ignition_timing);
+    _efiFactGroup.injTime()->setRawValue          (efi.injection_time);
+    _efiFactGroup.exGasTemp()->setRawValue        (efi.exhaust_gas_temperature);
+    _efiFactGroup.throttleOut()->setRawValue      (efi.throttle_out);
+    _efiFactGroup.ptComp()->setRawValue           (efi.pt_compensation);
+}
+
 void Vehicle::_handleFenceStatus(const mavlink_message_t& message)
 {
     mavlink_fence_status_t fenceStatus;
@@ -4508,4 +4573,32 @@ void Vehicle::sendGripperAction(GRIPPER_OPTIONS gripperOption)
         default: 
         break;
     }
+}
+
+// engine fact group
+const char* VehicleEngineFactGroup::_underway_thresholdFactName =      "underway_threshold";
+const char* VehicleEngineFactGroup::_gearFactName =      "gear";
+const char* VehicleEngineFactGroup::_rudder_angleFactName =      "rudder_angle";
+const char* VehicleEngineFactGroup::_steer_thr_stateFactName =      "steer_thr_state";
+const char* VehicleEngineFactGroup::_throttle_posFactName =      "steer_thr_state";
+
+VehicleEngineFactGroup::VehicleEngineFactGroup(QObject* parent)
+    : FactGroup(1000, ":/json/Vehicle/EngineFact.json", parent)
+    , _underway_thresholdFact    (0, _underway_thresholdFactName,     FactMetaData::valueTypeDouble)
+    , _gearFact    (0, _gearFactName,     FactMetaData::valueTypeDouble)
+    , _rudder_angleFact    (0, _rudder_angleFactName,     FactMetaData::valueTypeDouble)
+    , _steer_thr_stateFact    (0, _steer_thr_stateFactName,     FactMetaData::valueTypeDouble)
+{
+    _addFact(&_underway_thresholdFact,       _underway_thresholdFactName);
+    _addFact(&_gearFact,       _gearFactName);
+    _addFact(&_rudder_angleFact,       _rudder_angleFactName);
+    _addFact(&_steer_thr_stateFact,       _steer_thr_stateFactName);
+    _addFact(&_steer_thr_stateFact,       _throttle_posFactName);
+
+    // Start out as not available "--.--"
+    _underway_thresholdFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
+    _gearFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
+    _rudder_angleFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
+    _steer_thr_stateFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
+    _throttle_posFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
 }

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SYOSQGroundControl
+GenericName=SYOS Ground Control Station
+Icon=CustomAppIcon
+Exec=qgroundcontrol-start.sh
+Terminal=false
+Categories=Utility;

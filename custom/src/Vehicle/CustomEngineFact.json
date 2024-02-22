@@ -1,0 +1,42 @@
+{
+    "version":              1,
+    "fileType":             "FactMetaData",
+    "QGC.MetaData.Facts":
+[
+    {
+        "name":             "underway_threshold",
+        "shortDescription": "boat underway",
+        "type":             "double",
+        "decimalPlaces":    1,
+        "units":            ""
+    },
+    {
+        "name":             "gear",
+        "shortDescription": "Gear",
+        "type":             "double",
+        "decimalPlaces":    2,
+        "units":            ""
+    },
+    {
+        "name":             "rudder_angle",
+        "shortDescription": "Rudder angle",
+        "type":             "double",
+        "decimalPlaces":    2,
+        "units":            ""
+    },
+    {
+        "name":             "steer_thr_state",
+        "shortDescription": "Human or auto steering and throttle",
+        "type":             "double",
+        "decimalPlaces":    2,
+        "units":            ""
+    },
+    {
+        "name":             "throttle_pos",
+        "shortDescription": "Throttle position",
+        "type":             "double",
+        "decimalPlaces":    2,
+        "units":            "%"
+    }
+]
+}
