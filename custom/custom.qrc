@@ -7,6 +7,8 @@
         <file alias="compass_pointer.svg">res/Images/compass_pointer.svg</file>
         <file alias="payload_armed.svg">res/Images/payload_armed.svg</file>
         <file alias="payload_disarmed.svg">res/Images/payload_disarmed.svg</file>
+        <file alias="payload_init.svg">res/Images/payload_init.svg</file>
+        <file alias="payload_activate.svg">res/Images/payload_activate.svg</file>
     </qresource>
     <qresource prefix="Custom/Widgets">
         <file alias="Custom/Widgets/CustomActionConfirm.qml">res/Custom/Widgets/CustomActionConfirm.qml</file>

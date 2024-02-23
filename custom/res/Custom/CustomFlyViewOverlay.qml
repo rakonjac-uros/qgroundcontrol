@@ -946,5 +946,178 @@ Item {
         // }
     }
 
+    Rectangle {
+        id:                     payloadControl
+        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,_defaultWidgetOpacity)//0.3
+        width:                  testStatusGrid.width  + (ScreenTools.defaultFontPixelWidth  * 18)//5
+        height:                 testStatusGrid.height + (ScreenTools.defaultFontPixelHeight * 1.5)//1.5
+        radius:                 _defaultWidgetRadius
+        x:                      Math.round((mainWindow.width  - width)  * 0.5)//0.5
+        y:                      Math.round((mainWindow.height - height) * 0.8)//0.5
+        //anchors.top:            battTimeLoader.top
+        //anchors.topMargin:      ScreenTools.defaultFontPixelHeight * (_airspaceIndicatorVisible  ? 3 : 1.3)//
+        //anchors.left:           vehicleIndicator.left
+        //anchors.leftMargin:     ScreenTools.defaultFontPixelWidth  * 80
+        //  Layout
+        RowLayout {
+            id:                     payloadLayout2
+            // columnSpacing:          ScreenTools.defaultFontPixelWidth  * 2
+            // rowSpacing:             ScreenTools.defaultFontPixelHeight * 0.5
+            // columns:                10
+            anchors.centerIn:       parent
+            Layout.fillWidth:       false
+
+
+            ColumnLayout { // boat underway
+                Layout.fillWidth:       true
+                Layout.minimumWidth:    indicatorValueWidth
+                Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+
+                // QGCColoredImage {
+                //     height:                 _indicatorsHeight
+                //     width:                  height
+                //     source:                 "/res/cancel.svg" //"/qmlimages/Armed.svg"
+                //     fillMode:               Image.PreserveAspectFit
+                //     sourceSize.height:      height
+                //     Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                //     //color:                  qgcPal.text
+                // }
+                QGCLabel {
+                    text:                   activeVehicle ? getPayloadStatus(activeVehicle.engine.underway_threshold.value) : "-"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       true
+                    Layout.minimumWidth:    indicatorValueWidth
+                    horizontalAlignment:    Text.AlignHCenter
+
+                    function getPayloadStatus(payload_info){
+                        var payloadStatus;
+                        switch (payload_info) {
+                        case 1:
+                            payloadStatus = "READY"
+                            break
+                        default:
+                            payloadStatus = "NOT READY"
+                            break
+                        }
+                        return payloadStatus
+                    }
+                }
+                QGCLabel {
+                    text:                   "STATUS"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.smallFontPointSize
+                    Layout.fillWidth:       true
+                    Layout.minimumWidth:    indicatorValueWidth
+                    horizontalAlignment:    Text.AlignHCenter
+                    //wrapMode:               wrap
+                }
+                // QGCLabel {
+                //     //id:                     latLabel
+                //     text:                   "YES" // activeVehicle ? "Lat: " + activeVehicle.gps.lat.value.toFixed(activeVehicle.gps.lat.decimalPlaces) : "Lat: -"
+                //     color:                  _indicatorsColor
+                //     font.pointSize:         ScreenTools.mediumFontPointSize
+                //     Layout.fillWidth:       true
+                //     Layout.minimumWidth:    indicatorValueWidth
+                //     horizontalAlignment:    Text.AlignHCenter
+                //     //visible:                false
+                // }
+            }
+            QGCHoverButton { // init payload
+                id:             buttonInitPayload
+
+                //anchors.left:   toolStripColumn.left
+                //anchors.right:  toolStripColumn.right
+                // height:         _indicatorsHeight
+                // width:          height
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.minimumHeight: _indicatorsHeight * 2
+                Layout.minimumWidth: height
+                radius:         ScreenTools.defaultFontPixelWidth / 2
+                fontPointSize:  ScreenTools.smallFontPointSize
+                autoExclusive:  true
+
+                enabled:        true //modelData.buttonEnabled
+                visible:        true //modelData.buttonVisible
+                imageSource:    "/custom/img/payload_init.svg"
+                text:           "INIT"
+                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
+
+                //ButtonGroup.group: buttonGroup
+                // Only drop panel and toggleable are checkable
+                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
+
+                onClicked: {
+                    console.warn("btn pressed, action: ", actionPayloadInit)
+                    confirmAction(actionPayloadInit)
+                    //executeAction(actionPayloadInit)
+                }
+            }
+            QGCHoverButton {
+                id:             buttonActivatePayload
+
+                //anchors.left:   toolStripColumn.left
+                //anchors.right:  toolStripColumn.right
+                // height:         _indicatorsHeight
+                // width:          height
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.minimumHeight: _indicatorsHeight *2
+                Layout.minimumWidth: height
+                radius:         ScreenTools.defaultFontPixelWidth / 2
+                fontPointSize:  ScreenTools.smallFontPointSize
+                autoExclusive:  true
+
+                enabled:        true //modelData.buttonEnabled
+                visible:        true //modelData.buttonVisible
+                imageSource:    "/custom/img/payload_activate.svg"
+                text:           "ACTIVATE"
+                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
+
+                //ButtonGroup.group: buttonGroup
+                // Only drop panel and toggleable are checkable
+                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
+
+                onClicked: {
+                    console.warn("btn pressed, action: ", actionPayloadActivate)
+                    confirmAction(actionPayloadActivate)
+                    //executeAction(actionPayloadActivate)
+                }
+            }
+            QGCHoverButton {
+                id:             buttonResetPayload
+
+                //anchors.left:   toolStripColumn.left
+                //anchors.right:  toolStripColumn.right
+                //height:         _indicatorsHeight
+                //width:          height
+                // Layout.fillHeight: true
+                // Layout.fillWidth: true
+                Layout.minimumHeight: _indicatorsHeight
+                Layout.minimumWidth: _indicatorsHeight
+                radius:         ScreenTools.defaultFontPixelWidth / 2
+                fontPointSize:  ScreenTools.smallFontPointSize
+                autoExclusive:  true
+
+                enabled:        true //modelData.buttonEnabled
+                visible:        true //modelData.buttonVisible
+                imageSource:    "/res/XDelete.svg"
+                text:           "RESET"
+                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
+
+                //ButtonGroup.group: buttonGroup
+                // Only drop panel and toggleable are checkable
+                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
+
+                onClicked: {
+                    console.warn("btn pressed, action: ", actionPayloadReset)
+                    //confirmAction(actionPayloadReset)
+                    executeAction(actionPayloadReset)
+                }
+            }
+        }
+    }
+
     
 }
