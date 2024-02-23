@@ -37,6 +37,12 @@
         "type":             "double",
         "decimalPlaces":    2,
         "units":            "%"
+    },
+    {
+        "name":             "chan3",
+        "shortDescription": "Channel 3",
+        "type":             "int",
+        "units":            "%"
     }
 ]
 }

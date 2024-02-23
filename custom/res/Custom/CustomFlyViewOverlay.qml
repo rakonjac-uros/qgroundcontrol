@@ -541,108 +541,6 @@ Item {
 
             ColumnLayout { // RC Channel 3
 
-                property int rcValue: 1500
-                readonly property int _pwmMin:      800
-                readonly property int _pwmMax:      2200
-                readonly property int _pwmRange:    _pwmMax - _pwmMin
-                property int ch3Value: 1500
-
-                RCChannelMonitorController {
-                    id:             controller
-                }
-
-
-                // Live channel monitor control component
-                Component {
-                    id: channelMonitorDisplayComponent
-
-                    Item {
-                        height: ScreenTools.defaultFontPixelHeight
-
-                        property int    rcValue:    1500
-
-                        property int            __lastRcValue:      1500
-                        readonly property int   __rcValueMaxJitter: 2
-                        property color          __barColor:         qgcPal.windowShade
-
-                        // Bar
-                        Rectangle {
-                            id:                     bar
-                            anchors.verticalCenter: parent.verticalCenter
-                            width:                  parent.width
-                            height:                 parent.height / 2
-                            color:                  __barColor
-                        }
-
-                        // Center point
-                        Rectangle {
-                            anchors.horizontalCenter:   parent.horizontalCenter
-                            width:                      ScreenTools.defaultFontPixelWidth / 2
-                            height:                     parent.height
-                            color:                      qgcPal.window
-                        }
-
-                        // Indicator
-                        Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width:                  parent.height * 0.75
-                            height:                 width
-                            x:                      (((reversed ? _pwmMax - rcValue : rcValue - _pwmMin) / _pwmRange) * parent.width) - (width / 2)
-                            radius:                 width / 2
-                            color:                  qgcPal.text
-                            visible:                mapped
-                        }
-
-                        QGCLabel {
-                            anchors.fill:           parent
-                            horizontalAlignment:    Text.AlignHCenter
-                            verticalAlignment:      Text.AlignVCenter
-                            text:                   "Not Mapped"
-                            visible:                !mapped
-                        }
-
-                        ColorAnimation {
-                            id:         barAnimation
-                            target:     bar
-                            property:   "color"
-                            from:       "yellow"
-                            to:         __barColor
-                            duration:   1500
-                        }
-                    }
-                } // Component - channelMonitorDisplayComponent
-
-                Connections {
-                    target: controller
-
-                    onChannelRCValueChanged: {
-                        if (channelMonitorRepeater.itemAt(channel)) {
-                            channelMonitorRepeater.itemAt(channel).loader.item.rcValue = rcValue
-                        }
-                    }
-                }
-
-                Repeater {
-                    id:     channelMonitorRepeater
-                    model:  controller.channelCount
-
-                    RowLayout {
-                        // Need this to get to loader from Connections above
-                        property Item loader: theLoader
-
-                        Loader {
-                            id:                 theLoader
-                            Layout.fillWidth:   true
-                            //height:                 ScreenTools.defaultFontPixelHeight
-                            //width:                  parent.width - anchors.leftMargin - ScreenTools.defaultFontPixelWidth
-                            sourceComponent:        channelMonitorDisplayComponent
-
-                            property bool mapped:               true
-                            readonly property bool reversed:    false
-                        }
-                    }
-                }
-
                 QGCLabel {
                     text:                   "CH3"
                     color:                  _indicatorsColor
@@ -652,7 +550,7 @@ Item {
                     horizontalAlignment:    Text.AlignHCenter
                 }
                 QGCLabel {
-                    text:                   _activeVehicle ? (channelMonitorRepeater.itemAt(3).loader.item.rcValue + "%") : "-"
+                    text:                   _activeVehicle ? _activeVehicle.engine.chan3.valueString + "%" : "-"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.mediumFontPointSize
                     Layout.fillWidth:       true

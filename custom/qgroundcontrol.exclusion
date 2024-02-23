@@ -2,3 +2,4 @@
         <file alias="QGroundControl/FlightDisplay/FlyViewToolStrip.qml">src/FlightDisplay/FlyViewToolStrip.qml</file>
         <file alias="PlanView.qml">src/PlanView/PlanView.qml</file>
         <file alias="MultiVehicleSelector.qml">src/ui/toolbar/MultiVehicleSelector.qml</file>
+        <file alias="BatteryIndicator.qml">src/ui/toolbar/BatteryIndicator.qml</file>
