@@ -181,9 +181,9 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _hygrometerFactGroup          (this)
     , _generatorFactGroup           (this)
     , _efiFactGroup                 (this)
+    , _engineFactGroup              (this)
     , _terrainFactGroup             (this)
     , _terrainProtocolHandler       (new TerrainProtocolHandler(this, &_terrainFactGroup, this))
-    , _engineFactGroup              (this)
 {
     _linkManager = _toolbox->linkManager();
 

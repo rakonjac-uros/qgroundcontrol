@@ -19,7 +19,7 @@
 #include <QTranslator>
 
 class CustomOptions;
-class CustomPlugin;
+class SYOSPlugin;
 class CustomSettings;
 
 Q_DECLARE_LOGGING_CATEGORY(CustomLog)
@@ -37,7 +37,7 @@ public:
 class CustomOptions : public QGCOptions
 {
 public:
-    CustomOptions(CustomPlugin*, QObject* parent = nullptr);
+    CustomOptions(SYOSPlugin*, QObject* parent = nullptr);
 
     // Overrides from QGCOptions
     bool                    wifiReliableForCalibration  (void) const final;
@@ -48,12 +48,12 @@ private:
     CustomFlyViewOptions* _flyViewOptions = nullptr;
 };
 
-class CustomPlugin : public QGCCorePlugin
+class SYOSPlugin : public QGCCorePlugin
 {
     Q_OBJECT
 public:
-    CustomPlugin(QGCApplication* app, QGCToolbox *toolbox);
-    ~CustomPlugin();
+    SYOSPlugin(QGCApplication* app, QGCToolbox *toolbox);
+    ~SYOSPlugin();
 
     // Overrides from QGCCorePlugin
     QGCOptions*             options                         (void) final;

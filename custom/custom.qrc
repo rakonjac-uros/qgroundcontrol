@@ -15,7 +15,7 @@
         <file alias="Custom/Widgets/qmldir">res/Custom/Widgets/qmldir</file>
     </qresource>
     <qresource prefix="/qml">
-        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">res/CustomFlyViewOverlay.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">res/Custom/CustomFlyViewOverlay.qml</file>
         <file alias="QGroundControl/FlightDisplay/FlyViewToolStrip.qml">src/FlightDisplay/CustomFlyViewToolStrip.qml</file>
         <file alias="PlanView.qml">src/PlanView/CustomPlanView.qml</file>
     </qresource>

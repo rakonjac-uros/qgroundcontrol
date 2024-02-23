@@ -15,7 +15,7 @@
 #include "QGCSettings.h"
 #include "MAVLinkLogManager.h"
 
-#include "CustomPlugin.h"
+#include "SYOSPlugin.h"
 
 #include "MultiVehicleManager.h"
 #include "QGCApplication.h"
@@ -35,7 +35,7 @@ CustomFlyViewOptions::CustomFlyViewOptions(CustomOptions* options, QObject* pare
 // This custom build does not support conecting multiple vehicles to it. This in turn simplifies various parts of the QGC ui.
 bool CustomFlyViewOptions::showMultiVehicleList(void) const
 {
-    return false;
+    return true;
 }
 
 // This custom build has it's own custom instrument panel. Don't show regular one.
@@ -44,7 +44,7 @@ bool CustomFlyViewOptions::showInstrumentPanel(void) const
     return false;
 }
 
-CustomOptions::CustomOptions(CustomPlugin*, QObject* parent)
+CustomOptions::CustomOptions(SYOSPlugin*, QObject* parent)
     : QGCOptions(parent)
 {
 }
@@ -71,33 +71,33 @@ bool CustomOptions::wifiReliableForCalibration(void) const
     return true;
 }
 
-CustomPlugin::CustomPlugin(QGCApplication *app, QGCToolbox* toolbox)
+SYOSPlugin::SYOSPlugin(QGCApplication *app, QGCToolbox* toolbox)
     : QGCCorePlugin(app, toolbox)
 {
     _options = new CustomOptions(this, this);
     _showAdvancedUI = false;
 }
 
-CustomPlugin::~CustomPlugin()
+SYOSPlugin::~SYOSPlugin()
 {
 }
 
-void CustomPlugin::setToolbox(QGCToolbox* toolbox)
+void SYOSPlugin::setToolbox(QGCToolbox* toolbox)
 {
     QGCCorePlugin::setToolbox(toolbox);
 
     // Allows us to be notified when the user goes in/out out advanced mode
-    connect(qgcApp()->toolbox()->corePlugin(), &QGCCorePlugin::showAdvancedUIChanged, this, &CustomPlugin::_advancedChanged);
+    connect(qgcApp()->toolbox()->corePlugin(), &QGCCorePlugin::showAdvancedUIChanged, this, &SYOSPlugin::_advancedChanged);
 }
 
-void CustomPlugin::_advancedChanged(bool changed)
+void SYOSPlugin::_advancedChanged(bool changed)
 {
     // Firmware Upgrade page is only show in Advanced mode
     emit _options->showFirmwareUpgradeChanged(changed);
 }
 
 //-----------------------------------------------------------------------------
-void CustomPlugin::_addSettingsEntry(const QString& title, const char* qmlFile, const char* iconFile)
+void SYOSPlugin::_addSettingsEntry(const QString& title, const char* qmlFile, const char* iconFile)
 {
     Q_CHECK_PTR(qmlFile);
     // 'this' instance will take ownership on the QmlComponentInfo instance
@@ -108,22 +108,22 @@ void CustomPlugin::_addSettingsEntry(const QString& title, const char* qmlFile, 
                 this)));
 }
 
-QGCOptions* CustomPlugin::options()
+QGCOptions* SYOSPlugin::options()
 {
     return _options;
 }
 
-QString CustomPlugin::brandImageIndoor(void) const
+QString SYOSPlugin::brandImageIndoor(void) const
 {
     return QStringLiteral("/custom/img/CustomAppIcon.png");
 }
 
-QString CustomPlugin::brandImageOutdoor(void) const
+QString SYOSPlugin::brandImageOutdoor(void) const
 {
     return QStringLiteral("/custom/img/CustomAppIcon.png");
 }
 
-bool CustomPlugin::overrideSettingsGroupVisibility(QString name)
+bool SYOSPlugin::overrideSettingsGroupVisibility(QString name)
 {
     // We have set up our own specific brand imaging. Hide the brand image settings such that the end user
     // can't change it.
@@ -134,7 +134,7 @@ bool CustomPlugin::overrideSettingsGroupVisibility(QString name)
 }
 
 // This allows you to override/hide QGC Application settings
-bool CustomPlugin::adjustSettingMetaData(const QString& settingsGroup, FactMetaData& metaData)
+bool SYOSPlugin::adjustSettingMetaData(const QString& settingsGroup, FactMetaData& metaData)
 {
     bool parentResult = QGCCorePlugin::adjustSettingMetaData(settingsGroup, metaData);
 
@@ -154,7 +154,7 @@ bool CustomPlugin::adjustSettingMetaData(const QString& settingsGroup, FactMetaD
 }
 
 // This modifies QGC colors palette to match possible custom corporate branding
-void CustomPlugin::paletteOverride(QString colorName, QGCPalette::PaletteColorInfo_t& colorInfo)
+void SYOSPlugin::paletteOverride(QString colorName, QGCPalette::PaletteColorInfo_t& colorInfo)
 {
     if (colorName == QStringLiteral("window")) {
         colorInfo[QGCPalette::Dark][QGCPalette::ColorGroupEnabled]   = QColor("#212529");
@@ -345,7 +345,7 @@ void CustomPlugin::paletteOverride(QString colorName, QGCPalette::PaletteColorIn
 }
 
 // We override this so we can get access to QQmlApplicationEngine and use it to register our qml module
-QQmlApplicationEngine* CustomPlugin::createQmlApplicationEngine(QObject* parent)
+QQmlApplicationEngine* SYOSPlugin::createQmlApplicationEngine(QObject* parent)
 {
     QQmlApplicationEngine* qmlEngine = QGCCorePlugin::createQmlApplicationEngine(parent);
     qmlEngine->addImportPath("qrc:/Custom/Widgets");
