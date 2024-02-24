@@ -983,7 +983,7 @@ Item {
                 //     //color:                  qgcPal.text
                 // }
                 QGCLabel {
-                    text:                   activeVehicle ? getPayloadStatus(activeVehicle.engine.underway_threshold.value) : "-"
+                    text:                   _activeVehicle ? getPayloadStatus(_activeVehicle.engine.underway_threshold.value) : "-"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.mediumFontPointSize
                     Layout.fillWidth:       true
