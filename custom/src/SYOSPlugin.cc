@@ -41,7 +41,7 @@ bool CustomFlyViewOptions::showMultiVehicleList(void) const
 // This custom build has it's own custom instrument panel. Don't show regular one.
 bool CustomFlyViewOptions::showInstrumentPanel(void) const
 {
-    return false;
+    return true;
 }
 
 CustomOptions::CustomOptions(SYOSPlugin*, QObject* parent)

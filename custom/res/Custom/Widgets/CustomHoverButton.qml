@@ -25,7 +25,7 @@ Button {
     property real  borderWidth:     0
     property real  contentMargins: innerText.height * 0.1
 
-    property color hoverColor:      qgcPal.hoverColor
+    property color hoverColor:      "green"
 
     property color _currentColor:           qgcPal.button
     property color _currentContentColor:    qgcPal.buttonText

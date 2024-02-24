@@ -22,8 +22,8 @@ Rectangle {
     height:         confirmColumn.height + (_margins * 4)
     radius:         ScreenTools.defaultFontPixelHeight / 2
     color:          qgcPal.window
-    border.color:   _emergencyAction ? "red" : qgcPal.windowShade
-    border.width:   _emergencyAction ? 4 : 1
+    border.color:   qgcPal.windowShade
+    border.width:   1
     //z:              guidedController.z
     visible:        false
 
@@ -41,7 +41,6 @@ Rectangle {
     property alias  optionChecked:      optionCheckBox.checked
 
     property real _margins:         ScreenTools.defaultFontPixelWidth
-    //property bool _emergencyAction: action === guidedController.actionEmergencyStop
 
     onHideTriggerChanged: {
         if (hideTrigger) {

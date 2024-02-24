@@ -5,20 +5,20 @@
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
  *
- * @file
- *   @author Gus Grubba <gus@auterion.com>
+  * @file
+  *   @author Gus Grubba <gus@auterion.com>
  */
 
-import QtQuick 2.11
+import QtQuick 2.3
 
 Item {
     id: root
     property real   rollAngle :     0
     property real   pitchAngle:     0
-    property color  skyColor1:      Qt.hsla(0.6, 1.0, 0.25)
-    property color  skyColor2:      Qt.hsla(0.6, 0.5, 0.55)
-    property color  groundColor1:   Qt.hsla(0.25,  0.5, 0.45)
-    property color  groundColor2:   Qt.hsla(0.25, 0.75, 0.25)
+    property color  skyColor1:      "#d5e5ff"
+    property color  skyColor2:      "#aaccff"
+    property color  groundColor1:   "#0055d4"
+    property color  groundColor2:   "#0044aa"
 
     clip:           true
     anchors.fill:   parent

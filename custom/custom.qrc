@@ -12,15 +12,14 @@
     </qresource>
     <qresource prefix="Custom/Widgets">
         <file alias="Custom/Widgets/CustomActionConfirm.qml">res/Custom/Widgets/CustomActionConfirm.qml</file>
-        <file alias="Custom/Widgets/CustomArtificialHorizon.qml">res/Custom/Widgets/CustomArtificialHorizon.qml</file>
-        <file alias="Custom/Widgets/CustomAttitudeWidget.qml">res/Custom/Widgets/CustomAttitudeWidget.qml</file>
         <file alias="Custom/Widgets/CustomHoverButton.qml">res/Custom/Widgets/CustomHoverButton.qml</file>
         <file alias="Custom/Widgets/qmldir">res/Custom/Widgets/qmldir</file>
     </qresource>
     <qresource prefix="/qml">
-        <file alias="QGroundControl/FlightDisplay/FlyViewCustomLayer.qml">res/Custom/CustomFlyViewOverlay.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlyViewWidgetLayer.qml">res/Custom/CustomFlyViewWidgetLayer.qml</file>
         <file alias="QGroundControl/FlightDisplay/FlyViewToolStrip.qml">src/FlightDisplay/CustomFlyViewToolStrip.qml</file>
         <file alias="PlanView.qml">src/PlanView/CustomPlanView.qml</file>
+        <file alias="QGroundControl/FlightMap/QGCArtificialHorizon.qml">res/Custom/Widgets/CustomArtificialHorizon.qml</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="MultiVehicleSelector.qml">src/ui/toolbar/CustomMultiVehicleSelector.qml</file>
