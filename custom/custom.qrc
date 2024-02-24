@@ -23,6 +23,7 @@
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="MultiVehicleSelector.qml">src/ui/toolbar/CustomMultiVehicleSelector.qml</file>
+        <file alias="BatteryIndicator.qml">src/ui/toolbar/CustomBatteryIndicator.qml</file>
     </qresource>
     <qresource prefix="/json">
         <file alias="Vehicle/EngineFact.json">src/Vehicle/CustomEngineFact.json</file>

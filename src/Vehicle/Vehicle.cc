@@ -1894,7 +1894,8 @@ void Vehicle::_handleRCChannels(mavlink_message_t& message)
             pwmValues[i] = -1;
         }
     }
-
+    float percent = (pwmValues[2] - 1500)/500;
+    _engineFactGroup.chan3()->setRawValue((uint16_t)percent);
     emit remoteControlRSSIChanged(channels.rssi);
     emit rcChannelsChanged(channels.chancount, pwmValues);
 }
@@ -4576,11 +4577,12 @@ void Vehicle::sendGripperAction(GRIPPER_OPTIONS gripperOption)
 }
 
 // engine fact group
-const char* VehicleEngineFactGroup::_underway_thresholdFactName =      "underway_threshold";
-const char* VehicleEngineFactGroup::_gearFactName =      "gear";
-const char* VehicleEngineFactGroup::_rudder_angleFactName =      "rudder_angle";
+const char* VehicleEngineFactGroup::_underway_thresholdFactName =   "underway_threshold";
+const char* VehicleEngineFactGroup::_gearFactName =                 "gear";
+const char* VehicleEngineFactGroup::_rudder_angleFactName =         "rudder_angle";
 const char* VehicleEngineFactGroup::_steer_thr_stateFactName =      "steer_thr_state";
-const char* VehicleEngineFactGroup::_throttle_posFactName =      "steer_thr_state";
+const char* VehicleEngineFactGroup::_throttle_posFactName =         "throttle_pos";
+const char* VehicleEngineFactGroup::_chan3FactName =                "chan3";
 
 VehicleEngineFactGroup::VehicleEngineFactGroup(QObject* parent)
     : FactGroup(1000, ":/json/Vehicle/EngineFact.json", parent)
@@ -4588,12 +4590,15 @@ VehicleEngineFactGroup::VehicleEngineFactGroup(QObject* parent)
     , _gearFact    (0, _gearFactName,     FactMetaData::valueTypeDouble)
     , _rudder_angleFact    (0, _rudder_angleFactName,     FactMetaData::valueTypeDouble)
     , _steer_thr_stateFact    (0, _steer_thr_stateFactName,     FactMetaData::valueTypeDouble)
+    , _throttle_posFact (0, _throttle_posFactName, FactMetaData::valueTypeDouble) // Added this, probably was missing by mistake
+    , _chan3Fact    (0, _chan3FactName,     FactMetaData::valueTypeUint16)
 {
     _addFact(&_underway_thresholdFact,       _underway_thresholdFactName);
     _addFact(&_gearFact,       _gearFactName);
     _addFact(&_rudder_angleFact,       _rudder_angleFactName);
     _addFact(&_steer_thr_stateFact,       _steer_thr_stateFactName);
-    _addFact(&_steer_thr_stateFact,       _throttle_posFactName);
+    _addFact(&_throttle_posFact,       _throttle_posFactName);
+    _addFact(&_chan3Fact,       _chan3FactName);
 
     // Start out as not available "--.--"
     _underway_thresholdFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
@@ -4601,4 +4606,5 @@ VehicleEngineFactGroup::VehicleEngineFactGroup(QObject* parent)
     _rudder_angleFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
     _steer_thr_stateFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
     _throttle_posFact.setRawValue      (std::numeric_limits<float>::quiet_NaN());
+    _chan3Fact.setRawValue      (qQNaN());
 }

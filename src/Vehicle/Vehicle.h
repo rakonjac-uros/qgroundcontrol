@@ -104,18 +104,21 @@ public:
     Q_PROPERTY(Fact* rudder_angle       READ rudder_angle       CONSTANT)
     Q_PROPERTY(Fact* steer_thr_state       READ steer_thr_state       CONSTANT)
     Q_PROPERTY(Fact* throttle_pos       READ throttle_pos       CONSTANT)
+    Q_PROPERTY(Fact* chan3       READ chan3       CONSTANT)
 
     Fact* underway_threshold () { return &_underway_thresholdFact; }
     Fact* gear () { return &_gearFact; }
     Fact* rudder_angle () { return &_rudder_angleFact; }
     Fact* steer_thr_state () { return &_steer_thr_stateFact; }
     Fact* throttle_pos () { return &_throttle_posFact; }
+    Fact* chan3 () { return &_chan3Fact; }
 
     static const char* _underway_thresholdFactName;
     static const char* _gearFactName;
     static const char* _rudder_angleFactName;
     static const char* _steer_thr_stateFactName;
     static const char* _throttle_posFactName;
+    static const char* _chan3FactName;
 
     static const char* _settingsGroup;
 
@@ -127,6 +130,7 @@ private:
     Fact            _rudder_angleFact;
     Fact            _steer_thr_stateFact;
     Fact            _throttle_posFact;
+    Fact            _chan3Fact;
 };
 
 class Vehicle : public FactGroup
