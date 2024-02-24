@@ -5,6 +5,7 @@ import QtGraphicalEffects 1.0
 // TODO: Use QT styles. Use default button style + custom style entries
 import QGroundControl.ScreenTools 1.0
 import QGroundControl.Palette 1.0
+import QGroundControl.Controls 1.0
 
 // TODO: use QT palette
 Button {
