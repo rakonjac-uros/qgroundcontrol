@@ -14,6 +14,7 @@
         <file alias="Custom/Widgets/CustomActionConfirm.qml">res/Custom/Widgets/CustomActionConfirm.qml</file>
         <file alias="Custom/Widgets/CustomArtificialHorizon.qml">res/Custom/Widgets/CustomArtificialHorizon.qml</file>
         <file alias="Custom/Widgets/CustomAttitudeWidget.qml">res/Custom/Widgets/CustomAttitudeWidget.qml</file>
+        <file alias="Custom/Widgets/CustomHoverButton.qml">res/Custom/Widgets/CustomHoverButton.qml</file>
         <file alias="Custom/Widgets/qmldir">res/Custom/Widgets/qmldir</file>
     </qresource>
     <qresource prefix="/qml">

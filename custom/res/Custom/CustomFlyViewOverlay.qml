@@ -460,7 +460,7 @@ Item {
             }
 
             ColumnLayout {
-                QGCHoverButton {
+                CustomHoverButton {
                     id:             buttonStartMotor
 
                     //anchors.left:   toolStripColumn.left
@@ -499,7 +499,7 @@ Item {
             }
 
             ColumnLayout {
-                QGCHoverButton {
+                CustomHoverButton {
                     id:             buttonStopMotor
 
                     //anchors.left:   toolStripColumn.left
@@ -921,7 +921,7 @@ Item {
                 //     //visible:                false
                 // }
             }
-            QGCHoverButton { // init payload
+            CustomHoverButton { // init payload
                 id:             buttonInitPayload
 
                 //anchors.left:   toolStripColumn.left
@@ -952,7 +952,7 @@ Item {
                     //executeAction(actionPayloadInit)
                 }
             }
-            QGCHoverButton {
+            CustomHoverButton {
                 id:             buttonActivatePayload
 
                 //anchors.left:   toolStripColumn.left
@@ -983,7 +983,7 @@ Item {
                     //executeAction(actionPayloadActivate)
                 }
             }
-            QGCHoverButton {
+            CustomHoverButton {
                 id:             buttonResetPayload
 
                 //anchors.left:   toolStripColumn.left
