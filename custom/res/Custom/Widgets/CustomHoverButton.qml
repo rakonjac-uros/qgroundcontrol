@@ -27,6 +27,9 @@ Button {
 
     property color hoverColor:      "green"
 
+    property color _disabledColor:           qgcPal.button
+    property color _disabledColorText:       qgcPal.buttonText
+
     property color _currentColor:           qgcPal.button
     property color _currentContentColor:    qgcPal.buttonText
 
@@ -92,8 +95,10 @@ Button {
             name: "Default"
             PropertyChanges {
                 target: button;
-                _currentColor:          enabled ? ((checked || pressed) ? qgcPal.buttonHighlight : qgcPal.button) :         qgcPalDisabled.button
-                _currentContentColor:   enabled ? ((checked || pressed) ? qgcPal.buttonHighlightText : qgcPal.buttonText) : qgcPalDisabled.buttonText
+                _disabledColor:         qgcPal.globalTheme === QGCPalette.Light ? qgcPalDisabled.button : Qt.rgba(0.65,0.65,0.65,1)
+                _disabledColorText:     qgcPal.globalTheme === QGCPalette.Light ? qgcPalDisabled.buttonText : Qt.rgba(0.65,0.65,0.65,1)
+                _currentColor:          enabled ? ((checked || pressed) ? qgcPal.buttonHighlight : qgcPal.button) : _disabledColor   
+                _currentContentColor:   enabled ? ((checked || pressed) ? qgcPal.buttonHighlightText : qgcPal.buttonText) : _disabledColorText
             }
             PropertyChanges {
                 target: buttonBkRect

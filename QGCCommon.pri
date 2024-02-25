@@ -159,8 +159,7 @@ MobileBuild {
 StableBuild {
     message("Stable Build")
 } else {
-    message("Daily Build")
-    DEFINES += DAILY_BUILD
+    message("Daily Build. Not really...")
 }
 
 # Set the QGC version from git
@@ -184,9 +183,6 @@ exists ($$PWD/.git) {
         VERSION         = $$section(VERSION, ".", 0, 3)
     }
 
-    DailyBuild {
-        APP_VERSION_STR = "Daily $${GIT_BRANCH}:$${GIT_HASH} $${GIT_TIME}"
-    }
 
     message(QGroundControl APP_VERSION_STR VERSION $${APP_VERSION_STR} $${VERSION})
 

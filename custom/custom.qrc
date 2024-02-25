@@ -5,8 +5,6 @@
         <file alias="attitude_pointer.svg">res/Images/attitude_pointer.svg</file>
         <file alias="compass_needle.svg">res/Images/compass_needle.svg</file>
         <file alias="compass_pointer.svg">res/Images/compass_pointer.svg</file>
-        <file alias="payload_armed.svg">res/Images/payload_armed.svg</file>
-        <file alias="payload_disarmed.svg">res/Images/payload_disarmed.svg</file>
         <file alias="payload_init.svg">res/Images/payload_init.svg</file>
         <file alias="payload_activate.svg">res/Images/payload_activate.svg</file>
     </qresource>
@@ -20,6 +18,10 @@
         <file alias="QGroundControl/FlightDisplay/FlyViewToolStrip.qml">src/FlightDisplay/CustomFlyViewToolStrip.qml</file>
         <file alias="PlanView.qml">src/PlanView/CustomPlanView.qml</file>
         <file alias="QGroundControl/FlightMap/QGCArtificialHorizon.qml">res/Custom/Widgets/CustomArtificialHorizon.qml</file>
+        <file alias="QGroundControl/Controls/MainStatusIndicator.qml">src/ui/toolbar/CustomMainStatusIndicator.qml</file>
+    </qresource>
+    <qresource prefix="/qmlimages">
+	    <file alias="PaperPlane.svg">res/Images/Paperboat.svg</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="MultiVehicleSelector.qml">src/ui/toolbar/CustomMultiVehicleSelector.qml</file>

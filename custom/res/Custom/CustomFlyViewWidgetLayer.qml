@@ -55,12 +55,10 @@ Item {
     property real   _margins:               ScreenTools.defaultFontPixelWidth / 2
     property real   _toolsMargin:           ScreenTools.defaultFontPixelWidth * 0.75
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
-    property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
+    property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 40
     property alias  _gripperMenu:           gripperOptions
 
     property var    battery1:           _activeVehicle ? _activeVehicle.battery  : null
-    property var    battery2:           _activeVehicle ? _activeVehicle.battery2 : null
-    property bool   hasSecondBattery:   battery2 && battery2.voltage.value !== -1
 
     function getName(systemID){
         var vehicleName;
@@ -86,7 +84,6 @@ Item {
     // Called when an action is about to be executed in order to confirm
     function confirmAction(actionCode, actionData) {
         var showImmediate = true
-        //closeAll()
         customConfirmDialog.action = actionCode
         customConfirmDialog.actionData = actionData
         customConfirmDialog.hideTrigger = true
@@ -96,27 +93,22 @@ Item {
         case actionStopEngine:
             customConfirmDialog.title = "STOP ENGINE"
             customConfirmDialog.message = "WARNING: THIS WILL STOP THE ENGINE!"
-            //customConfirmDialog.hideTrigger = Qt.binding(function() { return !showEmergenyStop })
             break;
         case actionStartEngine:
             customConfirmDialog.title = "START ENGINE"
             customConfirmDialog.message = "INFO: Start the engine?"
-            //customConfirmDialog.hideTrigger = Qt.binding(function() { return !showEmergenyStop })
             break;
         case actionPayloadInit:
             customConfirmDialog.title = "INIT PAYLOAD"
             customConfirmDialog.message = "WARNING: THIS WILL INIT THE PAYLOAD!"
-            //customConfirmDialog.hideTrigger = Qt.binding(function() { return !showEmergenyStop })
             break;
         case actionPayloadActivate:
             customConfirmDialog.title = "ACTIVATE PAYLOAD"
             customConfirmDialog.message = "WARNING: THIS WILL ACTIVATE THE PAYLOAD!"
-            //customConfirmDialog.hideTrigger = Qt.binding(function() { return !showEmergenyStop })
             break;
         case actionPayloadReset:
             customConfirmDialog.title = "RESET PAYLOAD"
             customConfirmDialog.message = "WARNING: THIS WILL RESET THE PAYLOAD!"
-            //customConfirmDialog.hideTrigger = Qt.binding(function() { return !showEmergenyStop })
             break;
         default:
             console.warn("Unknown actionCode", actionCode)
@@ -131,46 +123,26 @@ Item {
         var rgVehicle;
         switch (actionCode) {
         case actionStopEngine:
-            // send mavlink command
-            // MAV_CMD_DO_SET_SERVO (183)
-            // param 1: instance
-            // param 2: PWM
-            _activeVehicle.sendCommand(0, 183, true, 13, 1900, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 13, 1900, 0, 0, 0, 0, 0)
             stopMotorTimer.running = true
             console.warn(qsTr("Sent stop engine command"), actionCode)
             break
         case actionStartEngine:
-            // send mavlink command
-            // MAV_CMD_DO_SET_SERVO (183)
-            // param 1: instance
-            // param 2: PWM
-            _activeVehicle.sendCommand(0, 183, true, 14, 1900, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 14, 1900, 0, 0, 0, 0, 0)
             startMotorTimer.running = true
             console.warn(qsTr("Sent start engine command"), actionCode)
             break
         case actionPayloadInit:
-            // send mavlink command
-            // MAV_CMD_DO_SET_SERVO (183)
-            // param 1: instance
-            // param 2: PWM
-            _activeVehicle.sendCommand(0, 183, true, 11, 1900, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 11, 1900, 0, 0, 0, 0, 0)
             console.warn(qsTr("Sent payload init command"), actionCode)
             break
         case actionPayloadActivate:
-            // send mavlink command
-            // MAV_CMD_DO_SET_SERVO (183)
-            // param 1: instance
-            // param 2: PWM
-            _activeVehicle.sendCommand(0, 183, true, 12, 1900, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 12, 1900, 0, 0, 0, 0, 0)
             console.warn(qsTr("Sent payload activate command"), actionCode)
             break
         case actionPayloadReset:
-            // send mavlink command
-            // MAV_CMD_DO_SET_SERVO (183)
-            // param 1: instance
-            // param 2: PWM
-            _activeVehicle.sendCommand(0, 183, true, 11, 1100, 0, 0, 0, 0, 0)
-            _activeVehicle.sendCommand(0, 183, true, 12, 1100, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 12, 1100, 0, 0, 0, 0, 0)
+            resetPayloadTimer.running = true
             console.warn(qsTr("Sent payload reset command"), actionCode)
             break
         default:
@@ -185,8 +157,7 @@ Item {
         running:   false;
         repeat:    false;
         onTriggered: {
-            // send set_servo cmd to servo 14 wil low value (1100)
-            _activeVehicle.sendCommand(0, 183, true, 14, 1100, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 14, 1100, 0, 0, 0, 0, 0)
             startMotorTimer.running = false
         }
     }
@@ -197,9 +168,19 @@ Item {
         running:   false;
         repeat:    false;
         onTriggered: {
-            // send set_servo cmd to servo 13 wil low value (1100)
-            _activeVehicle.sendCommand(0, 183, true, 13, 1100, 0, 0, 0, 0, 0)
+            _activeVehicle.sendCommand(1, 183, false, 13, 1100, 0, 0, 0, 0, 0)
             startMotorTimer.running = false
+        }
+    }
+
+    Timer {
+        id:        resetPayloadTimer
+        interval:  3000
+        running:   false;
+        repeat:    false;
+        onTriggered: {
+            _activeVehicle.sendCommand(1, 183, false, 11, 1100, 0, 0, 0, 0, 0)
+            resetPayloadTimer.running = false
         }
     }
 
@@ -281,6 +262,7 @@ Item {
     FlyViewInstrumentPanel {
         id:                         instrumentPanel
         anchors.margins:            _toolsMargin
+        anchors.topMargin: ScreenTools.defaultFontPixelHeight * 1.3
         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
         anchors.right:              parent.right
         width:                      _rightPanelWidth
@@ -489,197 +471,118 @@ Item {
         //  Layout
         RowLayout {
             id:                     vehicleStatusGrid
-            //columnSpacing:          ScreenTools.defaultFontPixelWidth  * 2
-            //rowSpacing:             ScreenTools.defaultFontPixelHeight * 0.5
-            //columns:                8
-            //rows:                   2
             anchors.centerIn:       parent
-            //Layout.fillWidth:     true //false
 
             ColumnLayout { // USV name
+
                 QGCLabel {
                     text:                   _activeVehicle ? getName(_activeVehicle.id) : "-"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    //Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillHeight: true
                     Layout.minimumWidth:    10
-                    //Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:    10
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     rotation: 270
                 }
+                
             }
 
             ColumnLayout {
+                Layout.fillHeight: true
                 CustomHoverButton {
                     id:             buttonStartMotor
-
-                    //anchors.left:   toolStripColumn.left
-                    //anchors.right:  toolStripColumn.right
-                    //height:         _indicatorsHeight
-                    //width:          height
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: height
+                    Layout.fillHeight: false
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: _indicatorsHeight * 3
+                    Layout.minimumWidth: indicatorValueWidth * 2
                     radius:         ScreenTools.defaultFontPixelWidth / 2
-                    fontPointSize:  ScreenTools.smallFontPointSize
+                    fontPointSize:  ScreenTools.mediumFontPointSize
                     autoExclusive:  true
 
-                    enabled:        _activeVehicle ? true : false //modelData.buttonEnabled
-                    visible:        true //modelData.buttonVisible
+                    enabled:        _activeVehicle ? true : false
+                    visible:        true
                     imageSource:    "/res/PowerButton"
                     text:           "START"
-                    checked:        false //modelData.checked !== undefined ? modelData.checked : checked
+                    checked:        false
                     borderColor:    "green"
                     borderWidth:    4
                     hoverColor:     "green"
-                    // border.color:   "red"
-                    // border.width:   4
-
-                    //ButtonGroup.group: buttonGroup
-                    // Only drop panel and toggleable are checkable
-                    //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
 
                     onPressed: {
                         console.warn("btn pressed, action: ", actionStartEngine)
                         confirmAction(actionStartEngine)
-                        //executeAction(actionStopEngine)
                     }
                 }
             }
 
             ColumnLayout {
+                Layout.fillHeight: true
                 CustomHoverButton {
                     id:             buttonStopMotor
-
-                    //anchors.left:   toolStripColumn.left
-                    //anchors.right:  toolStripColumn.right
-                    //height:         _indicatorsHeight
-                    //width:          height
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: height
+                    Layout.fillHeight: false
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: _indicatorsHeight * 3
+                    Layout.minimumWidth: indicatorValueWidth * 2
                     radius:         ScreenTools.defaultFontPixelWidth / 2
-                    fontPointSize:  ScreenTools.smallFontPointSize
+                    fontPointSize:  ScreenTools.mediumFontPointSize
                     autoExclusive:  true
 
-                    enabled:        _activeVehicle ? true : false //modelData.buttonEnabled
-                    visible:        true //modelData.buttonVisible
+                    enabled:        _activeVehicle ? true : false
+                    visible:        true
                     imageSource:    "/res/XDelete.svg"
                     text:           "STOP ENGINE"
-                    checked:        false //modelData.checked !== undefined ? modelData.checked : checked
+                    checked:        false
                     borderColor:    "red"
                     borderWidth:    4
                     hoverColor:     "red"
-                    // border.color:   "red"
-                    // border.width:   4
-
-                    //ButtonGroup.group: buttonGroup
-                    // Only drop panel and toggleable are checkable
-                    //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
 
                     onPressed: {
                         console.warn("btn pressed, action: ", actionStopEngine)
                         confirmAction(actionStopEngine)
-                        //executeAction(actionStopEngine)
-                    }
-                }
-            }
-
-
-
-            ColumnLayout { // RC Channel 3
-
-                QGCLabel {
-                    text:                   "CH3"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
-                }
-                QGCLabel {
-                    text:                   _activeVehicle ? _activeVehicle.engine.chan3.valueString + "%" : "-"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
-                    //verticalAlignment:      Text.AlignVCenter
-                }
-            }
-
-            ColumnLayout { // gear
-
-                QGCLabel {
-                    text:                   "GEAR"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
-                }
-                QGCLabel {
-                    text:                   _activeVehicle ? getGear(_activeVehicle.engine.gear.value) : "-"
-                    color:                  _indicatorsColor
-                    font.pointSize:         30
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
-                    verticalAlignment:      Text.AlignVCenter
-
-                    function getGear(gear){
-                        var vehicleName;
-                        switch (gear) {
-                        case 81:
-                            vehicleName = "N"
-                            break
-                        case 53:
-                            vehicleName = "F"
-                            break
-                        case 205:
-                            vehicleName = "R"
-                            break
-                        default:
-                            vehicleName = "-"
-                            break
-                        }
-                        return vehicleName
                     }
                 }
             }
 
             ColumnLayout { // throttle
+                id: vehicleIndicatorThrottle
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "THROTTLE"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
+                    Layout.minimumWidth:    indicatorValueWidth * 2
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
                 ColumnLayout {
-
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.fillHeight: true
+                    Layout.minimumHeight:    _indicatorsHeight * 2
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
 
                     QGCLabel {
                         text:                   _activeVehicle ? _activeVehicle.engine.throttle_pos.value.toFixed(0) : "-"
                         color:                  _indicatorsColor
                         font.pointSize:         ScreenTools.mediumFontPointSize
-                        Layout.fillWidth:       true
+                        Layout.fillWidth:       false
                         Layout.minimumWidth:    indicatorValueWidth
+                        Layout.minimumHeight:    _indicatorsHeight
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                         horizontalAlignment:    Text.AlignHCenter
                     }
                     QGCLabel {
                         text:                   _activeVehicle ? getThrottleControler(_activeVehicle.engine.steer_thr_state.value) : "-"
                         color:                  _indicatorsColor
-                        font.pointSize:         ScreenTools.smallFontPointSize
-                        Layout.fillWidth:       true
+                        font.pointSize:         ScreenTools.mediumFontPointSize
+                        Layout.fillWidth:       false
                         Layout.minimumWidth:    indicatorValueWidth
+                        Layout.minimumHeight:    _indicatorsHeight
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                         horizontalAlignment:    Text.AlignHCenter
 
                         function getThrottleControler(steer_thr_state){
@@ -704,31 +607,41 @@ Item {
             }
 
             ColumnLayout { // rudder
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "RUDDER"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
                 ColumnLayout {
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:     _indicatorsHeight*2
+                    Layout.alignment:         Qt.AlignVCenter | Qt.AlignHCenter
+                    Layout.fillHeight: true
 
                     QGCLabel {
                         text:                   _activeVehicle ? _activeVehicle.engine.rudder_angle.value.toFixed(1) : "-"
                         color:                  _indicatorsColor
                         font.pointSize:         ScreenTools.mediumFontPointSize
-                        Layout.fillWidth:       true
+                        Layout.fillWidth:       false
                         Layout.minimumWidth:    indicatorValueWidth
+                        Layout.minimumHeight:    _indicatorsHeight
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                         horizontalAlignment:    Text.AlignHCenter
                     }
                     QGCLabel {
                         text:                   _activeVehicle ? getSteeringControler(_activeVehicle.engine.steer_thr_state.value) : "-"
                         color:                  _indicatorsColor
-                        font.pointSize:         ScreenTools.smallFontPointSize
-                        Layout.fillWidth:       true
+                        font.pointSize:         ScreenTools.mediumFontPointSize
+                        Layout.fillWidth:       false
                         Layout.minimumWidth:    indicatorValueWidth
+                        Layout.minimumHeight:    _indicatorsHeight
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                         horizontalAlignment:    Text.AlignHCenter
 
 
@@ -753,97 +666,175 @@ Item {
                 }
             }
 
+             ColumnLayout { // RC Channel 3
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
+                QGCLabel {
+                    text:                   "CH3"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.minimumWidth:    indicatorValueWidth
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    horizontalAlignment:    Text.AlignHCenter
+                }
+                QGCLabel {
+                    text:                   _activeVehicle ? _activeVehicle.engine.chan3.valueString + "%" : "-"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
+                    Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    horizontalAlignment:    Text.AlignHCenter
+                }
+            }
 
+            ColumnLayout { // gear
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
+                QGCLabel {
+                    text:                   "GEAR"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
+                    Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    horizontalAlignment:    Text.AlignHCenter
+                }
+                QGCLabel {
+                    text:                   _activeVehicle ? getGear(_activeVehicle.engine.gear.value) : "-"
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
+                    Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    horizontalAlignment:    Text.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+
+                    function getGear(gear){
+                        var vehicleName;
+                        switch (gear) {
+                        case 81:
+                            vehicleName = "N"
+                            break
+                        case 53:
+                            vehicleName = "F"
+                            break
+                        case 205:
+                            vehicleName = "R"
+                            break
+                        default:
+                            vehicleName = "-"
+                            break
+                        }
+                        return vehicleName
+                    }
+                }
+            }
 
             ColumnLayout { // RPM
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "RPM"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
                 QGCLabel {
                     text:                   _activeVehicle ? _activeVehicle.efi.rpm.value : "-"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
-                    //verticalAlignment:      Text.AlignVCenter
                 }
             }
 
             ColumnLayout {
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "SPEED"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
-                // QGCColoredImage {
-                //     height:                 _indicatorsHeight
-                //     width:                  height
-                //     source:                 "/custom/img/horizontal_speed.svg"
-                //     fillMode:               Image.PreserveAspectFit
-                //     sourceSize.height:      height
-                //     Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
-                //     color:                  qgcPal.text
-                // }
                 QGCLabel {
                     text:                   _activeVehicle ? _activeVehicle.groundSpeed.value.toFixed(1) + ' ' + _activeVehicle.groundSpeed.units : "0.0"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
             }
 
 
-            ColumnLayout {
+            ColumnLayout { // Fuel
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "FUEL"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
 
-                // Gear
                 QGCLabel {
                     text:                   _activeVehicle ? _activeVehicle.efi.fuelFlow.value.toFixed(1) : "-"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
             }
 
-
             ColumnLayout { // battery
+                Layout.fillHeight: true
+                Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
                     text:                   "BATTERY"
                     color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
+                    font.pointSize:         ScreenTools.mediumFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
+
                 QGCLabel {
                     text: (battery1 && battery1.voltage.value !== -1) ? (battery1.voltage.valueString + " " + battery1.voltage.units) : "N/A"
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
+                    color:                  _indicatorsColor
+                    font.pointSize:         ScreenTools.largeFontPointSize
+                    Layout.fillWidth:       false
                     Layout.minimumWidth:    indicatorValueWidth
-                    Layout.minimumHeight:    indicatorValueWidth
+                    Layout.minimumHeight:    _indicatorsHeight
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
             }
@@ -853,158 +844,133 @@ Item {
     Rectangle {
         id:                     payloadControl
         color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
-        width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 18)//5
-        height:                 payloadLayout2.height + (ScreenTools.defaultFontPixelHeight * 1.5)//1.5
+        width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 10)//5
+        height:                 buttonInitPayload.height + payloadControlLabel.height + (ScreenTools.defaultFontPixelHeight * 1.5)//1.5
         radius:                 8
         x:                      Math.round((mainWindow.width  - width)  * 0.5)//0.5
         y:                      Math.round((mainWindow.height - height) * 0.8)//0.5
-        //  Layout
-        RowLayout {
-            id:                     payloadLayout2
-            // columnSpacing:          ScreenTools.defaultFontPixelWidth  * 2
-            // rowSpacing:             ScreenTools.defaultFontPixelHeight * 0.5
-            // columns:                10
+
+        ColumnLayout {
+            id:                     payloadControlColumnLayout
+            Layout.fillWidth:       true
             anchors.centerIn:       parent
-            //Layout.fillWidth:       false
+            anchors.margins:            _toolsMargin
 
-
-            ColumnLayout { // boat underway
+            QGCLabel {
+                id:                     payloadControlLabel
+                text:                   "PAYLOAD CONTROL"
+                color:                  _indicatorsColor
+                font.pointSize:         ScreenTools.largeFontPointSize
                 Layout.fillWidth:       true
-                Layout.minimumWidth:    indicatorValueWidth
+                Layout.minimumWidth:    indicatorValueWidth * 1.5
                 Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                horizontalAlignment:    Text.AlignHCenter
+                padding:                ScreenTools.defaultFontPixelWidth
+            }
+        
+            RowLayout {
+                id:                     payloadLayout2
+                Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                height:                 buttonInitPayload.height + ScreenTools.defaultFontPixelHeight
 
-                QGCLabel {
-                    text:                   _activeVehicle ? getPayloadStatus(_activeVehicle.engine.underway_threshold.value) : "-"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
+                ColumnLayout { // boat underway
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: buttonInitPayload.height
+                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
 
-                    function getPayloadStatus(payload_info){
-                        var payloadStatus;
-                        switch (payload_info) {
-                        case 1:
-                            payloadStatus = "READY"
-                            break
-                        default:
-                            payloadStatus = "NOT READY"
-                            break
+                    QGCLabel {
+                        text:                   _activeVehicle ? getPayloadStatus(_activeVehicle.engine.underway_threshold.value) : "-"
+                        color:                  _indicatorsColor
+                        font.pointSize:         ScreenTools.largeFontPointSize
+                        Layout.fillWidth:       false
+                        Layout.minimumWidth:    indicatorValueWidth
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                        horizontalAlignment:    Text.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+
+                        function getPayloadStatus(payload_info){
+                            var payloadStatus;
+                            switch (payload_info) {
+                            case 1:
+                                payloadStatus = "READY"
+                                break
+                            default:
+                                payloadStatus = "NOT READY"
+                                break
+                            }
+                            return payloadStatus
                         }
-                        return payloadStatus
+                    }
+                    QGCLabel {
+                        text:                   "STATUS"
+                        color:                  _indicatorsColor
+                        font.pointSize:         ScreenTools.mediumFontPointSize
+                        Layout.fillWidth:       false
+                        Layout.minimumWidth:    indicatorValueWidth * 1.5
+                        Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                        horizontalAlignment:    Text.AlignHCenter
                     }
                 }
-                QGCLabel {
-                    text:                   "STATUS"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth
-                    horizontalAlignment:    Text.AlignHCenter
-                    //wrapMode:               wrap
+                CustomHoverButton { // init payload
+                    id:             buttonInitPayload
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: _indicatorsHeight * 3
+                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    radius:         ScreenTools.defaultFontPixelWidth / 2
+                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    autoExclusive:  true
+
+                    enabled:        true
+                    visible:        true
+                    imageSource:    "/custom/img/payload_init.svg"
+                    text:           "INIT"
+                    checked:        false
+
+                    onClicked: {
+                        console.warn("btn pressed, action: ", actionPayloadInit)
+                        confirmAction(actionPayloadInit)
+                    }
                 }
-                // QGCLabel {
-                //     //id:                     latLabel
-                //     text:                   "YES" // activeVehicle ? "Lat: " + activeVehicle.gps.lat.value.toFixed(activeVehicle.gps.lat.decimalPlaces) : "Lat: -"
-                //     color:                  _indicatorsColor
-                //     font.pointSize:         ScreenTools.mediumFontPointSize
-                //     Layout.fillWidth:       true
-                //     Layout.minimumWidth:    indicatorValueWidth
-                //     horizontalAlignment:    Text.AlignHCenter
-                //     //visible:                false
-                // }
-            }
-            CustomHoverButton { // init payload
-                id:             buttonInitPayload
+                CustomHoverButton {
+                    id:             buttonActivatePayload
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: _indicatorsHeight * 3
+                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    radius:         ScreenTools.defaultFontPixelWidth / 2
+                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    autoExclusive:  true
 
-                //anchors.left:   toolStripColumn.left
-                //anchors.right:  toolStripColumn.right
-                // height:         _indicatorsHeight
-                // width:          height
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                Layout.minimumHeight: _indicatorsHeight * 2
-                Layout.minimumWidth: height
-                radius:         ScreenTools.defaultFontPixelWidth / 2
-                fontPointSize:  ScreenTools.smallFontPointSize
-                autoExclusive:  true
+                    enabled:        true
+                    visible:        true
+                    imageSource:    "/custom/img/payload_activate.svg"
+                    text:           "ACTIVATE"
+                    checked:        false
 
-                enabled:        true //modelData.buttonEnabled
-                visible:        true //modelData.buttonVisible
-                imageSource:    "/custom/img/payload_init.svg"
-                text:           "INIT"
-                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
-
-                //ButtonGroup.group: buttonGroup
-                // Only drop panel and toggleable are checkable
-                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
-
-                onClicked: {
-                    console.warn("btn pressed, action: ", actionPayloadInit)
-                    confirmAction(actionPayloadInit)
-                    //executeAction(actionPayloadInit)
+                    onClicked: {
+                        console.warn("btn pressed, action: ", actionPayloadActivate)
+                        confirmAction(actionPayloadActivate)
+                    }
                 }
-            }
-            CustomHoverButton {
-                id:             buttonActivatePayload
+                CustomHoverButton {
+                    id:             buttonResetPayload
+                    Layout.fillWidth: false
+                    Layout.minimumHeight: buttonActivatePayload.height
+                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    radius:         ScreenTools.defaultFontPixelWidth / 2
+                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    autoExclusive:  true
 
-                //anchors.left:   toolStripColumn.left
-                //anchors.right:  toolStripColumn.right
-                // height:         _indicatorsHeight
-                // width:          height
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                Layout.minimumHeight: _indicatorsHeight *2
-                Layout.minimumWidth: height
-                radius:         ScreenTools.defaultFontPixelWidth / 2
-                fontPointSize:  ScreenTools.smallFontPointSize
-                autoExclusive:  true
+                    enabled:        true
+                    visible:        true
+                    imageSource:    "/res/XDelete.svg"
+                    text:           "RESET"
+                    checked:        false
 
-                enabled:        true //modelData.buttonEnabled
-                visible:        true //modelData.buttonVisible
-                imageSource:    "/custom/img/payload_activate.svg"
-                text:           "ACTIVATE"
-                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
-
-                //ButtonGroup.group: buttonGroup
-                // Only drop panel and toggleable are checkable
-                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
-
-                onClicked: {
-                    console.warn("btn pressed, action: ", actionPayloadActivate)
-                    confirmAction(actionPayloadActivate)
-                    //executeAction(actionPayloadActivate)
-                }
-            }
-            CustomHoverButton {
-                id:             buttonResetPayload
-
-                //anchors.left:   toolStripColumn.left
-                //anchors.right:  toolStripColumn.right
-                //height:         _indicatorsHeight
-                //width:          height
-                // Layout.fillHeight: true
-                // Layout.fillWidth: true
-                Layout.minimumHeight: buttonActivatePayload.height
-                Layout.minimumWidth: _indicatorsHeight
-                radius:         ScreenTools.defaultFontPixelWidth / 2
-                fontPointSize:  ScreenTools.smallFontPointSize
-                autoExclusive:  true
-
-                enabled:        true //modelData.buttonEnabled
-                visible:        true //modelData.buttonVisible
-                imageSource:    "/res/XDelete.svg"
-                text:           "RESET"
-                checked:        false //modelData.checked !== undefined ? modelData.checked : checked
-
-                //ButtonGroup.group: buttonGroup
-                // Only drop panel and toggleable are checkable
-                //checkable: modelData.dropPanelComponent !== undefined || (modelData.toggle !== undefined && modelData.toggle)
-
-                onClicked: {
-                    console.warn("btn pressed, action: ", actionPayloadReset)
-                    //confirmAction(actionPayloadReset)
-                    executeAction(actionPayloadReset)
+                    onClicked: {
+                        console.warn("btn pressed, action: ", actionPayloadReset)
+                        executeAction(actionPayloadReset)
+                    }
                 }
             }
         }

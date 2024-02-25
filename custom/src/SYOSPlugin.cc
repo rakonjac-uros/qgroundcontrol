@@ -75,7 +75,6 @@ SYOSPlugin::SYOSPlugin(QGCApplication *app, QGCToolbox* toolbox)
     : QGCCorePlugin(app, toolbox)
 {
     _options = new CustomOptions(this, this);
-    _showAdvancedUI = false;
 }
 
 SYOSPlugin::~SYOSPlugin()
@@ -111,16 +110,6 @@ void SYOSPlugin::_addSettingsEntry(const QString& title, const char* qmlFile, co
 QGCOptions* SYOSPlugin::options()
 {
     return _options;
-}
-
-QString SYOSPlugin::brandImageIndoor(void) const
-{
-    return QStringLiteral("/custom/img/CustomAppIcon.png");
-}
-
-QString SYOSPlugin::brandImageOutdoor(void) const
-{
-    return QStringLiteral("/custom/img/CustomAppIcon.png");
 }
 
 bool SYOSPlugin::overrideSettingsGroupVisibility(QString name)
