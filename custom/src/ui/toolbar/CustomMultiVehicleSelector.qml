@@ -59,6 +59,20 @@ QGCComboBox {
         return vehicleName
     }
 
+    function getIDByName(name){
+        var systemID;
+        if (name == "ALPHA") {
+            return 1;
+        }
+        else if (name == "BRAVO") {
+            return 2;
+        }
+        else if (name == "CHARLIE") {
+            return 3;
+        }
+        return 4;
+    }
+
     function _updateVehicleModel() {
         var newCurrentIndex = -1
         var newModel = [ ]
@@ -78,7 +92,7 @@ QGCComboBox {
     }
 
     onActivated: {
-        var vehicleId = textAt(index).split(" ")[1]
+        var vehicleId = getIDByName(textAt(index));
         var vehicle = QGroundControl.multiVehicleManager.getVehicleById(vehicleId)
         QGroundControl.multiVehicleManager.activeVehicle = vehicle
     }

@@ -24,54 +24,11 @@ class CustomSettings;
 
 Q_DECLARE_LOGGING_CATEGORY(CustomLog)
 
-class CustomFlyViewOptions : public QGCFlyViewOptions
-{
-public:
-    CustomFlyViewOptions(CustomOptions* options, QObject* parent = nullptr);
-
-    // Overrides from CustomFlyViewOptions
-    bool                    showInstrumentPanel         (void) const final;
-    bool                    showMultiVehicleList        (void) const final;
-};
-
-class CustomOptions : public QGCOptions
-{
-public:
-    CustomOptions(SYOSPlugin*, QObject* parent = nullptr);
-
-    // Overrides from QGCOptions
-    bool                    wifiReliableForCalibration  (void) const final;
-    bool                    showFirmwareUpgrade         (void) const final;
-    QGCFlyViewOptions*      flyViewOptions(void) final;
-
-private:
-    CustomFlyViewOptions* _flyViewOptions = nullptr;
-};
-
 class SYOSPlugin : public QGCCorePlugin
 {
     Q_OBJECT
 public:
     SYOSPlugin(QGCApplication* app, QGCToolbox *toolbox);
     ~SYOSPlugin();
-
-    // Overrides from QGCCorePlugin
-    QGCOptions*             options                         (void) final;
-    bool                    overrideSettingsGroupVisibility (QString name) final;
-    bool                    adjustSettingMetaData           (const QString& settingsGroup, FactMetaData& metaData) final;
-    void                    paletteOverride                 (QString colorName, QGCPalette::PaletteColorInfo_t& colorInfo) final;
     QQmlApplicationEngine*  createQmlApplicationEngine      (QObject* parent) final;
-
-    // Overrides from QGCTool
-    void                    setToolbox                      (QGCToolbox* toolbox);
-
-private slots:
-    void _advancedChanged(bool advanced);
-
-private:
-    void _addSettingsEntry(const QString& title, const char* qmlFile, const char* iconFile = nullptr);
-
-private:
-    CustomOptions*  _options = nullptr;
-    QVariantList    _customSettingsList; // Not to be mixed up with QGCCorePlugin implementation
 };
