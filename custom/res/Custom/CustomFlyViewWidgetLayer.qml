@@ -58,7 +58,7 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 40
     property alias  _gripperMenu:           gripperOptions
 
-    property var    battery1:           _activeVehicle ? _activeVehicle.battery  : null
+    property var    battery1:               _activeVehicle ? globals.activeVehicle.batteries.get(0)  : null
 
     function getName(systemID){
         var vehicleName;

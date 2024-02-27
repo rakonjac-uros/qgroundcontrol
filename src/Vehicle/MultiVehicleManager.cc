@@ -50,6 +50,11 @@ MultiVehicleManager::MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbo
     connect(this, &MultiVehicleManager::activeVehicleChanged, this, &MultiVehicleManager::_changeVideoFeed);
 }
 
+MultiVehicleManager::~MultiVehicleManager()
+{
+    _stopVideoPipeline();
+}
+
 void MultiVehicleManager::setToolbox(QGCToolbox *toolbox)
 {
     QGCTool::setToolbox(toolbox);
@@ -484,12 +489,17 @@ std::string MultiVehicleManager::_getVehicleIP(int vehicleId)
     return vehicleIP;
 }
 
-void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
+void MultiVehicleManager::_stopVideoPipeline()
 {
-    if (_activePipelinePid != -1)
+    if (_activePipelinePid >= 0)
     {
         kill(_activePipelinePid, SIGKILL);
     }
+}
+
+void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
+{
+    _stopVideoPipeline();
     std::string ip_address = _getVehicleIP(vehicle->id());
     std::string videoType = _isThermalVideoActive ? "twfov" : "rgbwfov";
     std::string ffmpegCommand = "ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000";
