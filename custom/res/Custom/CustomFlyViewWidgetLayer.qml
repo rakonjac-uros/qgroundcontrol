@@ -175,7 +175,7 @@ Item {
 
     Timer {
         id:        resetPayloadTimer
-        interval:  3000
+        interval:  1000
         running:   false;
         repeat:    false;
         onTriggered: {
@@ -254,6 +254,7 @@ Item {
         anchors.margins:            _toolsMargin
         anchors.top:                parent.top
         anchors.horizontalCenter:   parent.horizontalCenter
+        anchors.centerIn:           parent
         z:                          QGroundControl.zOrderTopMost
         guidedController:           _guidedController
         guidedValueSlider:          _guidedValueSlider
@@ -309,6 +310,7 @@ Item {
         id:                 telemetryPanel
         x:                  recalcXPosition()
         anchors.margins:    _toolsMargin
+        visible:            false
 
         property real bottomEdgeCenterInset: 0
         property real rightEdgeCenterInset: 0
@@ -457,7 +459,7 @@ Item {
         }
     }
 
-    Rectangle {
+    Rectangle { // vehicle info
         id:                     vehicleIndicator
         color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
         width:                  vehicleStatusGrid.width  + (ScreenTools.defaultFontPixelWidth  * 10)//5
@@ -679,6 +681,16 @@ Item {
                     Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
                     horizontalAlignment:    Text.AlignHCenter
                 }
+                // QGCLabel {
+                //     text:                   _activeVehicle ? "PWM" + _activeVehicle.engine.chan3.valueString + "" : "PWM -"
+                //     color:                  _indicatorsColor
+                //     font.pointSize:         ScreenTools.mediumFontPointSize
+                //     Layout.fillWidth:       false
+                //     Layout.minimumWidth:    indicatorValueWidth
+                //     Layout.minimumHeight:    _indicatorsHeight
+                //     Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                //     horizontalAlignment:    Text.AlignHCenter
+                // }
                 QGCLabel {
                     text:                   _activeVehicle ? _activeVehicle.engine.chan3.valueString + "%" : "-"
                     color:                  _indicatorsColor
@@ -786,12 +798,11 @@ Item {
                 }
             }
 
-
             ColumnLayout { // Fuel
                 Layout.fillHeight: true
                 Layout.minimumHeight:    _indicatorsHeight * 3
                 QGCLabel {
-                    text:                   "FUEL"
+                    text:                   "FUEL FLOW"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.mediumFontPointSize
                     Layout.fillWidth:       false
@@ -828,7 +839,7 @@ Item {
                 }
 
                 QGCLabel {
-                    text: (battery1 && battery1.voltage.value !== -1) ? (battery1.voltage.valueString + " " + battery1.voltage.units) : "N/A"
+                    text:                   (_activeVehicle.battery0 && _activeVehicle.battery0.voltage.value !== -1) ? (_activeVehicle.battery0.voltage.valueString + " " + _activeVehicle.battery0.voltage.units) : "N/A"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.largeFontPointSize
                     Layout.fillWidth:       false
@@ -841,14 +852,31 @@ Item {
         }
     }
 
-    Rectangle {
+    Rectangle { // payload control
         id:                     payloadControl
         color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
         width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 10)//5
         height:                 buttonInitPayload.height + payloadControlLabel.height + (ScreenTools.defaultFontPixelHeight * 1.5)//1.5
         radius:                 8
-        x:                      Math.round((mainWindow.width  - width)  * 0.5)//0.5
+        x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
         y:                      Math.round((mainWindow.height - height) * 0.8)//0.5
+        anchors.margins:    _toolsMargin
+        //anchors.bottom: parent.bottom
+
+        function recalcXPosition() {
+            // First try centered
+            var halfRootWidth   = _root.width / 2
+            var halfPanelWidth  = payloadControl.width / 2
+            var leftX           = (halfRootWidth - halfPanelWidth) - _toolsMargin
+            var rightX          = (halfRootWidth + halfPanelWidth) + _toolsMargin
+            if (leftX >= parentToolInsets.leftEdgeBottomInset || rightX <= parentToolInsets.rightEdgeBottomInset ) {
+                // It will fit in the horizontalCenter
+                return halfRootWidth - halfPanelWidth
+            } else {
+                // Anchor to left edge
+                return parentToolInsets.leftEdgeBottomInset + _toolsMargin
+            }
+        }
 
         ColumnLayout {
             id:                     payloadControlColumnLayout
@@ -860,7 +888,7 @@ Item {
                 id:                     payloadControlLabel
                 text:                   "PAYLOAD CONTROL"
                 color:                  _indicatorsColor
-                font.pointSize:         ScreenTools.largeFontPointSize
+                font.pointSize:         ScreenTools.mediumFontPointSize
                 Layout.fillWidth:       true
                 Layout.minimumWidth:    indicatorValueWidth * 1.5
                 Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
@@ -905,7 +933,7 @@ Item {
                     QGCLabel {
                         text:                   "STATUS"
                         color:                  _indicatorsColor
-                        font.pointSize:         ScreenTools.mediumFontPointSize
+                        font.pointSize:         ScreenTools.smallFontPointSize
                         Layout.fillWidth:       false
                         Layout.minimumWidth:    indicatorValueWidth * 1.5
                         Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
@@ -916,14 +944,14 @@ Item {
                     id:             buttonInitPayload
                     Layout.fillWidth: false
                     Layout.minimumHeight: _indicatorsHeight * 3
-                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    Layout.minimumWidth: _indicatorsHeight * 3 //indicatorValueWidth * 1.5
                     radius:         ScreenTools.defaultFontPixelWidth / 2
-                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    fontPointSize:  ScreenTools.smallFontPointSize
                     autoExclusive:  true
 
                     enabled:        true
                     visible:        true
-                    imageSource:    "/custom/img/payload_init.svg"
+                    imageSource:    "/custom/img/payload_activate.svg"
                     text:           "INIT"
                     checked:        false
 
@@ -936,14 +964,14 @@ Item {
                     id:             buttonActivatePayload
                     Layout.fillWidth: false
                     Layout.minimumHeight: _indicatorsHeight * 3
-                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    Layout.minimumWidth: _indicatorsHeight * 3 //indicatorValueWidth * 1.5
                     radius:         ScreenTools.defaultFontPixelWidth / 2
-                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    fontPointSize:  ScreenTools.smallFontPointSize
                     autoExclusive:  true
 
                     enabled:        true
                     visible:        true
-                    imageSource:    "/custom/img/payload_activate.svg"
+                    imageSource:    "/custom/img/payload_init.svg"
                     text:           "ACTIVATE"
                     checked:        false
 
@@ -955,10 +983,10 @@ Item {
                 CustomHoverButton {
                     id:             buttonResetPayload
                     Layout.fillWidth: false
-                    Layout.minimumHeight: buttonActivatePayload.height
-                    Layout.minimumWidth: indicatorValueWidth * 1.5
+                    Layout.minimumHeight: _indicatorsHeight * 2
+                    Layout.minimumWidth: _indicatorsHeight * 2 //indicatorValueWidth * 1.5
                     radius:         ScreenTools.defaultFontPixelWidth / 2
-                    fontPointSize:  ScreenTools.mediumFontPointSize
+                    fontPointSize:  ScreenTools.smallFontPointSize
                     autoExclusive:  true
 
                     enabled:        true
@@ -969,7 +997,7 @@ Item {
 
                     onClicked: {
                         console.warn("btn pressed, action: ", actionPayloadReset)
-                        executeAction(actionPayloadReset)
+                        confirmAction(actionPayloadReset)
                     }
                 }
             }

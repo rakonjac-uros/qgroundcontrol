@@ -32,7 +32,8 @@
     </qresource>
     <qresource prefix="/res">
         <file alias="QGCLogoBlack">res/Images/QGCLogoBlack.svg</file>
-		<file alias="QGCLogoFull">res/Images/QGCLogoFull.svg</file>
+	<file alias="QGCLogoFull">res/Images/QGCLogoFull.svg</file>
         <file alias="QGCLogoWhite">res/Images/QGCLogoWhite.svg</file>
+        <file alias="SYOSLogoWhite">res/Images/syos_logo_w.svg</file>
     </qresource>
 </RCC>
