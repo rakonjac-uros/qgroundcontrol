@@ -58,8 +58,6 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 40
     property alias  _gripperMenu:           gripperOptions
 
-    property var    battery1:               _activeVehicle ? globals.activeVehicle.batteries.get(0)  : null
-
     function getName(systemID){
         var vehicleName;
         switch (systemID) {
@@ -850,7 +848,7 @@ Item {
                 }
 
                 QGCLabel {
-                    text: (battery1 && battery1.voltage.value !== -1) ? (battery1.voltage.valueString + " " + battery1.voltage.units) : "N/A"
+                    text: _activeVehicle ? (_activeVehicle.batteries.get(0).voltage.valueString + " " + _activeVehicle.batteries.get(0).voltage.units) : "N/A"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.largeFontPointSize
                     Layout.fillWidth:       false
