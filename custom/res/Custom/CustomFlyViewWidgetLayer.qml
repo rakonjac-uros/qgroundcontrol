@@ -305,6 +305,28 @@ Item {
         property bool _verticalCenter: !QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue
     }
 
+    Row {
+        id:                 videoTypePanelSelector
+        anchors.bottom:     photoVideoControl.bottom
+        anchors.right:      parent.right
+        width:              _rightPanelWidth
+        spacing:            ScreenTools.defaultFontPixelWidth
+
+        QGCRadioButton {
+            id:             rgbVideo
+            text:           qsTr("RGB")
+            checked:        true
+            textColor:      mapPal.text
+            onClicked:      QGroundControl.multiVehicleManager.changeActiveVideoStream(false)
+        }
+
+        QGCRadioButton {
+            text:           qsTr("Thermal")
+            textColor:      mapPal.text
+            onClicked:      QGroundControl.multiVehicleManager.changeActiveVideoStream(true)
+        }
+    }
+
     TelemetryValuesBar {
         id:                 telemetryPanel
         x:                  recalcXPosition()

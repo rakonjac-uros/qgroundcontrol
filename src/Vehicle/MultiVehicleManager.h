@@ -48,6 +48,7 @@ public:
 
     // Methods
 
+    Q_INVOKABLE void changeActiveVideoStream(bool thermal); 
     Q_INVOKABLE Vehicle* getVehicleById(int vehicleId);
 
     UAS* activeUas(void) { return _activeVehicle ? _activeVehicle->uas() : nullptr; }
@@ -96,6 +97,11 @@ private slots:
     void _coordinateChanged             (QGeoCoordinate coordinate);
 
 private:
+    bool _isThermalVideoActive;
+    void _changeVideoFeed(Vehicle *);
+    pid_t _activePipelinePid;
+    std::string _getVehicleIP(int vehicleId);
+
     bool _vehicleExists(int vehicleId);
 
     bool        _activeVehicleAvailable;            ///< true: An active vehicle is available
