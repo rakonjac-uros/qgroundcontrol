@@ -1895,10 +1895,20 @@ void Vehicle::_handleRCChannels(mavlink_message_t& message)
         }
     }
 
-    float percent = (pwmValues[2] - 1500)/500;
-    if(percent<0) percent = 0;
-    if(percent>100) percent = 100;
-    _engineFactGroup.chan3()->setRawValue(percent);
+    float percent;
+    if (channels.chan3_raw <= 1500)
+    {
+        percent = 0;
+    }
+    else if (channels.chan3_raw > 2000)
+    {
+        percent = 100;
+    }
+    else
+    {
+        percent = (channels.chan3_raw - 1500) / 5;
+    }
+    _engineFactGroup.chan3()->setRawValue((uint16_t)percent);
 
     emit remoteControlRSSIChanged(channels.rssi);
     emit rcChannelsChanged(channels.chancount, pwmValues);
@@ -4354,8 +4364,6 @@ void Vehicle::_handleNamedValue(const mavlink_message_t& message)
 {
     mavlink_named_value_float_t o;
     mavlink_msg_named_value_float_decode(&message, &o);
-    //std::string value_name(&o.name.toString());
-    printf("RECV named_value %s %.2f\n", o.name, o.value);
     if (strncmp(o.name, "underway_t", 4) == 0)
     {
         _engineFactGroup.underway_threshold()->setRawValue(o.value);

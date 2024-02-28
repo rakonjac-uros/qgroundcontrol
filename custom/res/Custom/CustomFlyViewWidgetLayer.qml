@@ -58,8 +58,6 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 40
     property alias  _gripperMenu:           gripperOptions
 
-    property var    battery1:           _activeVehicle ? _activeVehicle.battery  : null
-
     function getName(systemID){
         var vehicleName;
         switch (systemID) {
@@ -304,6 +302,28 @@ Item {
         ]
 
         property bool _verticalCenter: !QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue
+    }
+
+    Row {
+        id:                 videoTypePanelSelector
+        anchors.bottom:     photoVideoControl.bottom
+        anchors.right:      parent.right
+        width:              _rightPanelWidth
+        spacing:            ScreenTools.defaultFontPixelWidth
+
+        QGCRadioButton {
+            id:             rgbVideo
+            text:           qsTr("RGB")
+            checked:        true
+            textColor:      mapPal.text
+            onClicked:      QGroundControl.multiVehicleManager.changeActiveVideoStream(false)
+        }
+
+        QGCRadioButton {
+            text:           qsTr("Thermal")
+            textColor:      mapPal.text
+            onClicked:      QGroundControl.multiVehicleManager.changeActiveVideoStream(true)
+        }
     }
 
     TelemetryValuesBar {
@@ -839,7 +859,8 @@ Item {
                 }
 
                 QGCLabel {
-                    text:                   (_activeVehicle.battery0 && _activeVehicle.battery0.voltage.value !== -1) ? (_activeVehicle.battery0.voltage.valueString + " " + _activeVehicle.battery0.voltage.units) : "N/A"
+
+                    text: _activeVehicle ? (_activeVehicle.batteries.get(0).voltage.valueString + " " + _activeVehicle.batteries.get(0).voltage.units) : "N/A"
                     color:                  _indicatorsColor
                     font.pointSize:         ScreenTools.largeFontPointSize
                     Layout.fillWidth:       false
