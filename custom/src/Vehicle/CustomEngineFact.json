@@ -41,8 +41,7 @@
     {
         "name":             "chan3",
         "shortDescription": "Channel 3",
-        "type":             "double",
-        "decimalPlaces":    2,
+        "type":             "uint16",
         "units":            "%"
     }
 ]
