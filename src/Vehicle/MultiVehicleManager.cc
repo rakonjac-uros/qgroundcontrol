@@ -19,6 +19,7 @@
 #include "QGCOptions.h"
 #include "LinkManager.h"
 #include <signal.h>
+#include <iostream>
 
 #if defined (__ios__) || defined(__android__)
 #include "MobileScreenMgr.h"
@@ -48,6 +49,7 @@ MultiVehicleManager::MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbo
     _gcsHeartbeatTimer.setInterval(_gcsHeartbeatRateMSecs);
     _gcsHeartbeatTimer.setSingleShot(false);
     connect(this, &MultiVehicleManager::activeVehicleChanged, this, &MultiVehicleManager::_changeVideoFeed);
+    signal(SIGCHLD, SIG_IGN);
 }
 
 MultiVehicleManager::~MultiVehicleManager()
@@ -447,7 +449,9 @@ pid_t systemFork(const char *command, int *infp, int *outfp)
         setsid();
         while (true)
         {
-            execl("/bin/bash", "bash", "-c", command, NULL);
+            int systemCommandStatus;
+            systemCommandStatus = system(command);
+            std::cout << "system call exit code: " << systemCommandStatus << std::endl;
         }
     }
 
@@ -499,10 +503,10 @@ void MultiVehicleManager::_stopVideoPipeline()
 
 void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
 {
-    // ffmpeg -i srt://10.49.0.5:8890?streamid=read:rgbwfov&latency=900000 -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001
+    // ffmpeg -i srt://10.49.0.5:8890?streamid=read:rgbwfov -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001
     _stopVideoPipeline();
     std::string ip_address = _getVehicleIP(vehicle->id());
     std::string videoType = _isThermalVideoActive ? "twfov" : "rgbwfov";
-    std::string ffmpegCommand = "ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + "&latency=900000 -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001";
+    std::string ffmpegCommand = "/usr/bin/ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000 -c:v copy -f mpegts udp://127.0.0.1:5001";
     _activePipelinePid = systemFork(ffmpegCommand.c_str(), NULL, NULL);
 }

@@ -102,6 +102,7 @@ Item {
         //http://{ip}:9002/ptu/pan/{value}
         var http = new XMLHttpRequest()
         var url = "http://" + address + ":9002/ptu/pan/" + panValue;
+        var params = "";
         http.open("POST", url, true);
 
         // Send the proper header information along with the request
@@ -118,13 +119,14 @@ Item {
                 }
             }
         }
-        //http.send(params);
+        http.send(params);
     }
 
     function sendTiltValue(address, tiltValue) {
         //http://{ip}:9002/ptu/tilt/{value}
         var http = new XMLHttpRequest()
         var url = "http://" + address + ":9002/ptu/tilt/" + tiltValue;
+        var params = "";
         http.open("POST", url, true);
 
         // Send the proper header information along with the request
@@ -141,7 +143,7 @@ Item {
                 }
             }
         }
-        //http.send(params);
+        http.send(params);
     }
 
     property var _actionData
@@ -1209,7 +1211,7 @@ Item {
                     Layout.maximumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "RGB"
                     checked:        true
@@ -1229,7 +1231,7 @@ Item {
                     Layout.maximumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "TH"
                     checkable:      true
@@ -1261,7 +1263,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "FRONT"
                     checked:        false
@@ -1294,7 +1296,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "UP"
                     checked:        false
@@ -1309,7 +1311,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "-0-"
                     checked:        false
@@ -1329,7 +1331,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "LEFT"
                     checked:        false
@@ -1344,7 +1346,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "BACK"
                     checked:        false
@@ -1359,7 +1361,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "RIGHT"
                     checked:        false
@@ -1374,7 +1376,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "<<"
                     checked:        false
@@ -1389,7 +1391,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           "DOWN"
                     checked:        false
@@ -1404,7 +1406,7 @@ Item {
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
+                    enabled:        _activeVehicle
                     visible:        true
                     text:           ">>"
                     checked:        false
