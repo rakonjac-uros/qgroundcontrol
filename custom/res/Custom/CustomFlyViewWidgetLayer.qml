@@ -16,6 +16,7 @@ import QtLocation               5.3
 import QtPositioning            5.3
 import QtQuick.Window           2.2
 import QtQml.Models             2.1
+import QtWebSockets             1.15
 
 import QGroundControl               1.0
 import QGroundControl.Controls      1.0
@@ -57,6 +58,7 @@ Item {
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 50
     property alias  _gripperMenu:           gripperOptions
+
 
     function getName(systemID){
         var vehicleName
@@ -254,6 +256,71 @@ Item {
         anchors.horizontalCenter:   parent.horizontalCenter
         customCommandController:    _root
     }
+
+    property var cameraPos: [
+        { pan: 0, tilt: 0 }, // Camera 1
+        { pan: 0, tilt: 0 }, // Camera 2
+        { pan: 0, tilt: 0 }  // Camera 3
+    ]
+
+    WebSocket { // alpha
+        id: socket1
+        url: "ws://10.49.0.3:9002/v1/sentrydatasource"
+
+        onTextMessageReceived: {
+            var somestring = JSON.parse(message)
+            // var msgType = somestring.type;
+            // if (msgType === "result") {
+            //     //Someaction()
+            // }
+            console.log("ALPHA: " + somestring)
+        }
+    }
+    WebSocket { // bravo
+        id: socket2
+        url: "ws://10.49.0.4:9002/v1/sentrydatasource"
+
+        onTextMessageReceived: {
+            var somestring = JSON.parse(message)
+            // var msgType = somestring.type;
+            // if (msgType === "result") {
+            //     //Someaction()
+            // }
+            console.log("BRAVO: " + somestring)
+        }
+    }
+    WebSocket { // charlie
+        id: socket3
+        url: "ws://10.49.0.5:9002/v1/sentrydatasource"
+
+        onTextMessageReceived: {
+            var somestring = JSON.parse(message)
+            // var msgType = somestring.type;
+            // if (msgType === "result") {
+            //     //Someaction()
+            // }
+            console.log("CHARLIE: " + somestring)
+        }
+    }
+
+    // Instantiator {
+    //     id: socketManager
+    //     property var names: ["alpha", "bravo", "charlie"]
+    //     delegate: WebSocket{
+    //         //id: socket
+    //         url: "ws://localhost:9002"
+
+    //         onTextMessageReceived: {
+    //             var somestring = JSON.parse(message)
+    //             var msgType = somestring.type;
+    //             if (msgType === "result") {
+    //                 console.log(somestring.type)
+    //             }
+    //         }
+    //     }
+    //     model: names
+    //     active: (names.length > 0)
+    // }
 
     QGCToolInsets {
         id:                     _totalToolInsets
@@ -1082,7 +1149,7 @@ Item {
         }
     }
 
-    Rectangle {
+    Rectangle { // camera control
         id:                 videoTypePanelSelector
         anchors.bottom:     parent.bottom
         //anchors.right:      parent.right
@@ -1237,13 +1304,20 @@ Item {
                         sendTiltValue(getIP(_activeVehicle.id),"20")
                     }
                 }
-                Item {
+                QGCButton {
                     Layout.fillWidth: true
                     Layout.minimumHeight: _indicatorsHeight
                     Layout.minimumWidth: _indicatorsHeight
                     Layout.maximumWidth: _rightPanelWidth / 6.5
                     enabled:        true
                     visible:        true
+                    text:           "-0-"
+                    checked:        false
+
+                    onClicked: {
+                        console.info("Zero tilt")
+                        sendTiltValue(getIP(_activeVehicle.id),"0")
+                    }
                 }
             }
             RowLayout {
