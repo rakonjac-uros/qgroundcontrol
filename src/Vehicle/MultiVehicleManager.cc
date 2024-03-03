@@ -505,6 +505,6 @@ void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
     _stopVideoPipeline();
     std::string ip_address = _getVehicleIP(vehicle->id());
     std::string videoType = _isThermalVideoActive ? "twfov" : "rgbwfov";
-    std::string ffmpegCommand = "while true; do /usr/local/bin/ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000 -c:v copy -f mpegts udp://127.0.0.1:5001; sleep 1; done";
+    std::string ffmpegCommand = "while true; do /usr/local/bin/ffmpeg -i \"srt://" + ip_address + ":8890?streamid=read:" + videoType + "&latency=900000\" -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001; sleep 1; done";
     _activePipelinePid = systemFork(ffmpegCommand.c_str(), NULL, NULL);
 }
