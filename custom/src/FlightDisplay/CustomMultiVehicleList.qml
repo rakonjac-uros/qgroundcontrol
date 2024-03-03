@@ -21,8 +21,8 @@ import QGroundControl.FlightMap     1.0
 Item {
     property real   _margin:            ScreenTools.defaultFontPixelWidth / 2
     property real   _widgetHeight:      ScreenTools.defaultFontPixelHeight * 3
-    property color  _textColor:         "black"
-    property real   _rectOpacity:       0.8
+    property color  _textColor:         "white"
+    property real   _rectOpacity:       0.9
     property var    _guidedController:  globals.guidedControllerFlyView
 
     QGCPalette { id: qgcPal }
@@ -32,9 +32,9 @@ Item {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         mvCommandsColumn.height + (_margin *2)
-        color:          qgcPal.missionItemEditor
-        opacity:        _rectOpacity
-        radius:         _margin
+        color:          qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5) //qgcPal.missionItemEditor
+        //opacity:        _rectOpacity
+        radius:         8 //_margin
 
         DeadMouseArea {
             anchors.fill: parent
@@ -91,8 +91,8 @@ Item {
         delegate: Rectangle {
             width:      missionItemEditorListView.width
             height:     innerColumn.y + innerColumn.height + _margin
-            color:      qgcPal.missionItemEditor
-            opacity:    _rectOpacity
+            color:      qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5) //qgcPal.missionItemEditor
+            //opacity:    _rectOpacity
             radius:     _margin
 
             property var    _vehicle:   object

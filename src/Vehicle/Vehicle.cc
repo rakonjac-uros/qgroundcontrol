@@ -4603,7 +4603,7 @@ VehicleEngineFactGroup::VehicleEngineFactGroup(QObject* parent)
     , _rudder_angleFact    (0, _rudder_angleFactName,     FactMetaData::valueTypeDouble)
     , _steer_thr_stateFact    (0, _steer_thr_stateFactName,     FactMetaData::valueTypeDouble)
     , _throttle_posFact (0, _throttle_posFactName, FactMetaData::valueTypeDouble) // Added this, probably was missing by mistake
-    , _chan3Fact    (0, _chan3FactName,     FactMetaData::valueTypeDouble)
+    , _chan3Fact    (0, _chan3FactName,     FactMetaData::valueTypeUint16)
 {
     _addFact(&_underway_thresholdFact,       _underway_thresholdFactName);
     _addFact(&_gearFact,       _gearFactName);

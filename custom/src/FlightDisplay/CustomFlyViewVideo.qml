@@ -43,7 +43,7 @@ Item {
 
     Timer {
         id:           videoStartDelay
-        interval:     2000;
+        interval:     1000;
         running:      false
         repeat:       false
         onTriggered:  QGroundControl.videoManager.startVideo()
@@ -56,6 +56,7 @@ Item {
         useSmallFont:   _root.pipState.state !== _root.pipState.fullState
         visible:        QGroundControl.videoManager.isGStreamer
     }
+
     //-- UVC Video (USB Camera or Video Device)
     Loader {
         id:             cameraLoader
