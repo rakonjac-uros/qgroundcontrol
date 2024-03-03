@@ -421,7 +421,6 @@ pid_t systemFork(const char *command, int *infp, int *outfp)
     int p_stdin[2];
     int p_stdout[2];
     pid_t pid;
-    pid_t pgid;
 
     if (pipe(p_stdin) == -1)
         return -1;
@@ -447,13 +446,9 @@ pid_t systemFork(const char *command, int *infp, int *outfp)
         dup2(p_stdout[1], 1);
         dup2(::open("/dev/null", O_RDONLY), 2);
 
-        pgid = setsid();
-        while (true)
-        {
-            int systemCommandStatus;
-            systemCommandStatus = system(command);
-            std::cout << "system call exit code: " << systemCommandStatus << std::endl;
-        }
+        setsid();
+        execl("/bin/bash", "bash", "-c", command, NULL);
+        exit(1);
     }
 
     close(p_stdin[0]);
@@ -471,7 +466,7 @@ pid_t systemFork(const char *command, int *infp, int *outfp)
         *outfp = p_stdout[0];
     }
 
-    return pgid;
+    return pid;
 }
 
 std::string MultiVehicleManager::_getVehicleIP(int vehicleId)
@@ -498,7 +493,9 @@ void MultiVehicleManager::_stopVideoPipeline()
 {
     if (_activePipelinePid >= 0)
     {
-        killpg(_activePipelinePid, SIGKILL);
+        kill(_activePipelinePid, SIGKILL);
+        int killallReturn = system("killall ffmpeg");
+        std::cout << "killall command return value: " << killallReturn << std::endl;
     }
 }
 
@@ -508,8 +505,6 @@ void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
     _stopVideoPipeline();
     std::string ip_address = _getVehicleIP(vehicle->id());
     std::string videoType = _isThermalVideoActive ? "twfov" : "rgbwfov";
-    //std::string ffmpegCommand = "/usr/local/bin/ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000 -c:v copy -f mpegts udp://127.0.0.1:5001";
-    std::string ffmpegCommand = "/usr/local/bin/ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316";
+    std::string ffmpegCommand = "while true; do /usr/local/bin/ffmpeg -i srt://" + ip_address + ":8890?streamid=read:" + videoType + " -c:v copy -f rtp udp://127.0.0.1:5000 -c:v copy -f mpegts udp://127.0.0.1:5001; sleep 1; done";
     _activePipelinePid = systemFork(ffmpegCommand.c_str(), NULL, NULL);
-    std::cout << "active pipeline pid: " << _activePipelinePid << std::endl;
 }
