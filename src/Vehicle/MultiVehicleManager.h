@@ -34,7 +34,6 @@ class MultiVehicleManager : public QGCTool
 
 public:
     MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbox);
-    ~MultiVehicleManager();
 
     Q_INVOKABLE void        saveSetting (const QString &key, const QString& value);
     Q_INVOKABLE QString     loadSetting (const QString &key, const QString& defaultValue);
@@ -49,7 +48,6 @@ public:
 
     // Methods
 
-    Q_INVOKABLE void changeActiveVideoStream(bool thermal); 
     Q_INVOKABLE Vehicle* getVehicleById(int vehicleId);
 
     UAS* activeUas(void) { return _activeVehicle ? _activeVehicle->uas() : nullptr; }
@@ -98,12 +96,6 @@ private slots:
     void _coordinateChanged             (QGeoCoordinate coordinate);
 
 private:
-    bool _isThermalVideoActive;
-    void _changeVideoFeed(Vehicle *);
-    pid_t _activePipelinePid;
-    std::string _getVehicleIP(int vehicleId);
-    void _stopVideoPipeline();
-
     bool _vehicleExists(int vehicleId);
 
     bool        _activeVehicleAvailable;            ///< true: An active vehicle is available

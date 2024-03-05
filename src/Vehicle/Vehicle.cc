@@ -1562,10 +1562,10 @@ void Vehicle::_updateArmed(bool armed)
             _trajectoryPoints->stop();
             _flightTimerStop();
             // Also handle Video Streaming
-            if(qgcApp()->toolbox()->videoManager()->videoReceiver()) {
+            if(qgcApp()->toolbox()->videoManager()->videoReceiverRGB1()) {
                 if(_settingsManager->videoSettings()->disableWhenDisarmed()->rawValue().toBool()) {
                     _settingsManager->videoSettings()->streamEnabled()->setRawValue(false);
-                    qgcApp()->toolbox()->videoManager()->videoReceiver()->stop();
+                    qgcApp()->toolbox()->videoManager()->videoReceiverRGB1()->stop();
                 }
             }
         }

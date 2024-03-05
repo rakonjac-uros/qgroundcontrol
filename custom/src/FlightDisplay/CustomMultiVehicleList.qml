@@ -19,11 +19,14 @@ import QGroundControl.Vehicle       1.0
 import QGroundControl.FlightMap     1.0
 
 Item {
+    //id: root
     property real   _margin:            ScreenTools.defaultFontPixelWidth / 2
     property real   _widgetHeight:      ScreenTools.defaultFontPixelHeight * 3
     property color  _textColor:         "white"
     property real   _rectOpacity:       0.9
     property var    _guidedController:  globals.guidedControllerFlyView
+
+    signal message(var id)
 
     QGCPalette { id: qgcPal }
 
@@ -88,6 +91,25 @@ Item {
 
         property real _cacheBuffer:     height * 2
 
+        function getName(systemID){
+            var vehicleName
+            switch (systemID) {
+            case 1:
+                vehicleName = "ALPHA"
+                break
+            case 2:
+                vehicleName = "BRAVO"
+                break
+            case 3:
+                vehicleName = "CHARLIE"
+                break
+            default:
+                vehicleName = "UNKNOWN"
+                break
+            }
+            return vehicleName
+        }
+
         delegate: Rectangle {
             width:      missionItemEditorListView.width
             height:     innerColumn.y + innerColumn.height + _margin
@@ -110,7 +132,7 @@ Item {
 
                     QGCLabel {
                         Layout.alignment:   Qt.AlignTop
-                        text:               _vehicle ? _vehicle.id : ""
+                        text:               _vehicle ? getName(_vehicle.id) : ""
                         color:              _textColor
                     }
 
@@ -130,6 +152,7 @@ Item {
                             text:                       _vehicle && _vehicle.armed ? qsTr("Armed") : qsTr("Disarmed")
                             color:                      _textColor
                         }
+
                     }
 
                     QGCCompassWidget {
@@ -147,6 +170,10 @@ Item {
                 Row {
                     spacing: ScreenTools.defaultFontPixelWidth
 
+                    QGCButton {
+                        text:       qsTr("Show video")
+                        onClicked:  message(_vehicle.id)
+                    }
                     QGCButton {
                         text:       qsTr("Arm")
                         visible:    _vehicle && !_vehicle.armed

@@ -58,6 +58,7 @@ Item {
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 50
     property alias  _gripperMenu:           gripperOptions
+    property real   _defaultWidgetOpacity:  0.7
 
 
     function getName(systemID){
@@ -259,51 +260,51 @@ Item {
         customCommandController:    _root
     }
 
-    property var cameraPos: [
-        { pan: 0, tilt: 0 }, // Camera 1
-        { pan: 0, tilt: 0 }, // Camera 2
-        { pan: 0, tilt: 0 }  // Camera 3
-    ]
+    // property var cameraPos: [
+    //     { pan: 0, tilt: 0 }, // Camera 1
+    //     { pan: 0, tilt: 0 }, // Camera 2
+    //     { pan: 0, tilt: 0 }  // Camera 3
+    // ]
 
-    WebSocket { // alpha
-        id: socket1
-        url: "ws://10.49.0.3:9002/v1/sentrydatasource"
+    // WebSocket { // alpha
+    //     id: socket1
+    //     url: "ws://10.49.0.3:9002/v1/sentrydatasource"
 
-        onTextMessageReceived: {
-            var somestring = JSON.parse(message)
-            // var msgType = somestring.type;
-            // if (msgType === "result") {
-            //     //Someaction()
-            // }
-            console.log("ALPHA: " + somestring)
-        }
-    }
-    WebSocket { // bravo
-        id: socket2
-        url: "ws://10.49.0.4:9002/v1/sentrydatasource"
+    //     onTextMessageReceived: {
+    //         var somestring = JSON.parse(message)
+    //         // var msgType = somestring.type;
+    //         // if (msgType === "result") {
+    //         //     //Someaction()
+    //         // }
+    //         console.log("ALPHA: " + somestring)
+    //     }
+    // }
+    // WebSocket { // bravo
+    //     id: socket2
+    //     url: "ws://10.49.0.4:9002/v1/sentrydatasource"
 
-        onTextMessageReceived: {
-            var somestring = JSON.parse(message)
-            // var msgType = somestring.type;
-            // if (msgType === "result") {
-            //     //Someaction()
-            // }
-            console.log("BRAVO: " + somestring)
-        }
-    }
-    WebSocket { // charlie
-        id: socket3
-        url: "ws://10.49.0.5:9002/v1/sentrydatasource"
+    //     onTextMessageReceived: {
+    //         var somestring = JSON.parse(message)
+    //         // var msgType = somestring.type;
+    //         // if (msgType === "result") {
+    //         //     //Someaction()
+    //         // }
+    //         console.log("BRAVO: " + somestring)
+    //     }
+    // }
+    // WebSocket { // charlie
+    //     id: socket3
+    //     url: "ws://10.49.0.5:9002/v1/sentrydatasource"
 
-        onTextMessageReceived: {
-            var somestring = JSON.parse(message)
-            // var msgType = somestring.type;
-            // if (msgType === "result") {
-            //     //Someaction()
-            // }
-            console.log("CHARLIE: " + somestring)
-        }
-    }
+    //     onTextMessageReceived: {
+    //         var somestring = JSON.parse(message)
+    //         // var msgType = somestring.type;
+    //         // if (msgType === "result") {
+    //         //     //Someaction()
+    //         // }
+    //         console.log("CHARLIE: " + somestring)
+    //     }
+    // }
 
     // Instantiator {
     //     id: socketManager
@@ -373,6 +374,7 @@ Item {
     }
 
     MultiVehicleList {
+        id: multiVehicleList
         anchors.margins:    _toolsMargin
         anchors.top:        multiVehiclePanelSelector.bottom
         anchors.right:      parent.right
@@ -380,7 +382,6 @@ Item {
         height:             parent.height - y - _toolsMargin
         visible:            !multiVehiclePanelSelector.showSingleVehiclePanel
     }
-
 
     GuidedActionConfirm {
         anchors.margins:            _toolsMargin
@@ -405,6 +406,601 @@ Item {
 
         property real rightEdgeTopInset: visible ? parent.width - x : 0
         property real topEdgeRightInset: visible ? y + height : 0
+    }
+
+
+    signal windowAboutToOpen    // Catch this signal to do something special prior to the item transition to windowed mode
+    signal windowAboutToClose   // Catch this signal to do special processing prior to the item transition back to pip mode
+
+
+    Window {
+        id:         windowBravo
+        title:      "BRAVO"
+        visible:    true
+        width: parent.width /4
+        height: parent.height /4
+
+        property int _vehicleID: 2
+
+        //-- Video 2
+        Rectangle {
+            anchors.fill: parent
+            // anchors.margins:        _toolsMargin
+            // anchors.right:          parent.right
+            // anchors.top: rgbItem.bottom
+            // width:                  _rightPanelWidth
+            // height: _rightPanelWidth*0.7
+            //width:              height * QGroundControl.videoManager.thermalAspectRatio
+            //height:             _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_FULL ? parent.height : (_camera.thermalMode === QGCCameraControl.THERMAL_PIP ? ScreenTools.defaultFontPixelHeight * 12 : parent.height * _thermalHeightFactor)) : 0
+            //anchors.centerIn:   parent
+            visible:            true //QGroundControl.videoManager.hasThermal && _camera.thermalMode !== QGCCameraControl.THERMAL_OFF
+
+            QGCVideoBackground {
+                id:             videoReceiverRGB1
+                objectName:     "videoReceiverRGB1"
+                anchors.fill:   parent
+                receiver:       QGroundControl.videoManager.videoReceiverRGB1
+                visible: btnBravoRGB.checked
+                //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
+            }
+        }
+        QGCVideoBackground {
+            id:             videoReceiverTh1
+            objectName:     "videoReceiverTh1"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.videoReceiverTh1
+            visible: btnBravoTh.checked
+            //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
+        }
+
+        Connections {
+            target: multiVehicleList
+            onMessage: {
+                if(id == 2) {
+                    windowBravo.show()
+                }
+                console.log(id)
+            }
+        }
+
+        Rectangle { // camera control
+            id:                 videoTypePanelSelector2
+            //anchors.bottom:     parent.bottom
+            //anchors.right:      parent.right
+            anchors.margins:        _toolsMargin
+            width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 12)//5
+            height:             _indicatorsHeight * 8
+            color:                  Qt.rgba(0,0,0,0.5)
+            radius:                 8
+            //x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
+
+            anchors.right:          parent.right
+            anchors.bottom: parent.bottom
+
+            ColumnLayout {
+
+                id:                     cameraControlColumnLayout2
+                Layout.fillWidth:       true
+                anchors.centerIn:       parent
+                anchors.margins:            _toolsMargin
+
+                RowLayout{
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        enabled:        true
+                        visible:        true
+                    }
+                    QGCButton {
+                        id: btnBravoRGB
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight * 0.8
+                        Layout.maximumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true //_activeVehicle
+                        visible:        true
+                        text:           "RGB"
+                        checked:        true
+                        checkable:      true
+                        pointSize:      ScreenTools.smallFontPointSize
+
+                        onClicked: {
+                            console.log("Bravo RGB")
+                            btnBravoRGB.checked = true
+                            btnBravoTh.checked = false
+                        }
+                    }
+                    QGCButton {
+                        id: btnBravoTh
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight * 0.8
+                        Layout.maximumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true //_activeVehicle
+                        visible:        true
+                        text:           "TH"
+                        checkable:      true
+                        checked:        false
+                        pointSize:      ScreenTools.smallFontPointSize
+
+                        onClicked: {
+                            console.log("Bravo THERM")
+                            btnBravoRGB.checked = false
+                            btnBravoTh.checked = true
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    height:                 _indicatorsHeight * 3
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "FRONT"
+                        checked:        false
+
+                        onClicked: {
+                            console.log("FRONT")
+                            sendPanValue(getIP(2),"0")
+                        }
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "UP"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("UP")
+                            sendTiltValue(getIP(2),"20")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "-0-"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("Zero tilt")
+                            sendTiltValue(getIP(2),"0")
+                        }
+                    }
+                }
+                RowLayout {
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    height:                 _indicatorsHeight * 3
+
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "LEFT"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("LEFT")
+                            sendPanValue(getIP(2),"-90")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "BACK"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("BACK")
+                            sendPanValue(getIP(2),"180")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "RIGHT"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("RIGHT")
+                            sendPanValue(getIP(2),"90")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "-30"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("-30")
+                            sendPanValue(getIP(2),"-30")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "DOWN"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("DOWN")
+                            sendTiltValue(getIP(2),"-20")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "+30"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("+30")
+                            sendPanValue(getIP(2),"30")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Window {
+        id:         windowCharlie
+        title:      "CHARLIE"
+        visible:    true
+        width: parent.width /4
+        height: parent.height /4
+
+
+        Rectangle {
+            anchors.fill: parent
+            // anchors.margins:        _toolsMargin
+            // anchors.right:          parent.right
+            // anchors.top: rgbItem.bottom
+            // width:                  _rightPanelWidth
+            // height: _rightPanelWidth*0.7
+            //width:              height * QGroundControl.videoManager.thermalAspectRatio
+            //height:             _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_FULL ? parent.height : (_camera.thermalMode === QGCCameraControl.THERMAL_PIP ? ScreenTools.defaultFontPixelHeight * 12 : parent.height * _thermalHeightFactor)) : 0
+            //anchors.centerIn:   parent
+            visible:            true //QGroundControl.videoManager.hasThermal && _camera.thermalMode !== QGCCameraControl.THERMAL_OFF
+
+            QGCVideoBackground {
+                id:             videoReceiverRGB2
+                objectName:     "videoReceiverRGB2"
+                anchors.fill:   parent
+                receiver:       QGroundControl.videoManager.videoReceiverRGB2
+                visible:        btnCharlieRGB.checked
+                //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
+            }
+        }
+
+        QGCVideoBackground {
+            id:             videoReceiverTh2
+            objectName:     "videoReceiverTh2"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.videoReceiverTh2
+            visible:        btnCharlieTh.checked
+            //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
+        }
+
+        Connections {
+            target: multiVehicleList
+            onMessage: {
+                console.log(id)
+                if(id == 3) {
+                    windowCharlie.show()
+                }
+            }
+        }
+
+        Rectangle { // camera control
+            //anchors.bottom:     parent.bottom
+            //anchors.right:      parent.right
+            anchors.margins:        _toolsMargin
+            width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 12)//5
+            height:             _indicatorsHeight * 8
+            color:                  Qt.rgba(0,0,0,0.5)
+            radius:                 8
+            //x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
+
+            anchors.right:          parent.right
+            anchors.bottom: parent.bottom
+
+            property int _vehicleID: 3
+
+            ColumnLayout {
+                Layout.fillWidth:       true
+                anchors.centerIn:       parent
+                anchors.margins:            _toolsMargin
+
+                RowLayout{
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        enabled:        true
+                        visible:        true
+                    }
+                    QGCButton {
+                        id: btnCharlieRGB
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight * 0.8
+                        Layout.maximumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "RGB"
+                        checked:        true
+                        checkable:      true
+                        pointSize:      ScreenTools.smallFontPointSize
+
+                        onClicked: {
+                            btnCharlieRGB.checked = true
+                            btnCharlieTh.checked = false
+                        }
+                    }
+                    QGCButton {
+                        id: btnCharlieTh
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight * 0.8
+                        Layout.maximumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "TH"
+                        checkable:      true
+                        checked:        false
+                        pointSize:      ScreenTools.smallFontPointSize
+
+                        onClicked: {
+                            btnCharlieRGB.checked = false
+                            btnCharlieTh.checked = true
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    height:                 _indicatorsHeight * 3
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "FRONT"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("FRONT")
+                            sendPanValue(getIP(3),"0")
+                        }
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        true
+                        visible:        true
+
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "UP"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("UP")
+                            sendTiltValue(getIP(3),"20")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "-0-"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("Zero tilt")
+                            sendTiltValue(getIP(3),"0")
+                        }
+                    }
+                }
+                RowLayout {
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    height:                 _indicatorsHeight * 3
+
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "LEFT"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("LEFT")
+                            sendPanValue(getIP(3),"-90")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "BACK"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("BACK")
+                            sendPanValue(getIP(3),"180")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "RIGHT"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("RIGHT")
+                            sendPanValue(getIP(3),"90")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "-30"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("-30")
+                            sendPanValue(getIP(3),"-30")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "DOWN"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("DOWN")
+                            sendTiltValue(getIP(3),"-20")
+                        }
+                    }
+                    QGCButton {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: _indicatorsHeight
+                        Layout.minimumWidth: _indicatorsHeight
+                        Layout.maximumWidth: _rightPanelWidth / 6.5
+                        enabled:        _activeVehicle
+                        visible:        true
+                        text:           "+30"
+                        checked:        false
+
+                        onClicked: {
+                            console.info("+30")
+                            sendPanValue(getIP(3),"30")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     PhotoVideoControl {
@@ -452,11 +1048,12 @@ Item {
     //     }
     // }
 
+
     TelemetryValuesBar {
         id:                 telemetryPanel
         x:                  recalcXPosition()
         anchors.margins:    _toolsMargin
-        visible:            false
+        visible:            _activeVehicle
 
         property real bottomEdgeCenterInset: 0
         property real rightEdgeCenterInset: 0
@@ -607,7 +1204,7 @@ Item {
 
     Rectangle { // vehicle info
         id:                     vehicleIndicator
-        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
+        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,_defaultWidgetOpacity)//0.3
         width:                  vehicleStatusGrid.width  + (ScreenTools.defaultFontPixelWidth  * 10)//5
         height:                 vehicleStatusGrid.height + (ScreenTools.defaultFontPixelHeight * 1.5)//2.5
         radius:                 8
@@ -1001,14 +1598,19 @@ Item {
 
     Rectangle { // payload control
         id:                     payloadControl
-        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
+        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,_defaultWidgetOpacity)//0.3
         width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 12)//5
         height:                 buttonInitPayload.height + payloadControlLabel.height + (ScreenTools.defaultFontPixelHeight * 1.5)//1.5
         radius:                 8
         x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
         //y:                      Math.round((mainWindow.height - height) * 0.7)//0.5
-        anchors.margins:    _toolsMargin
-        anchors.bottom: videoTypePanelSelector.top
+        anchors.bottom: telemetryPanel.top
+
+        anchors.margins:        _toolsMargin
+        anchors.horizontalCenter:      parent.horizontalCenter
+        //anchors.top:            vehicleIndicator.bottom
+        //width:                  _rightPanelWidth
+
 
         function recalcXPosition() {
             // First try centered
@@ -1151,272 +1753,276 @@ Item {
         }
     }
 
-    Rectangle { // camera control
-        id:                 videoTypePanelSelector
-        anchors.bottom:     parent.bottom
-        //anchors.right:      parent.right
-        anchors.margins:        _toolsMargin
-        width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 12)//5
-        height:             _indicatorsHeight * 8
-        color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,0.5)//0.3
-        radius:                 8
-        x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
+    // Rectangle { // camera control
+    //     id:                 videoTypePanelSelector
+    //     //anchors.bottom:     parent.bottom
+    //     //anchors.right:      parent.right
+    //     anchors.margins:        _toolsMargin
+    //     width:                  payloadLayout2.width  + (ScreenTools.defaultFontPixelWidth  * 12)//5
+    //     height:             _indicatorsHeight * 8
+    //     color:                  qgcPal.globalTheme === QGCPalette.Light ? Qt.rgba(1,1,1,0.95) : Qt.rgba(0,0,0,_defaultWidgetOpacity)//0.3
+    //     radius:                 8
+    //     x:                      recalcXPosition() //Math.round((mainWindow.width  - width)  * 0.5)//0.5
 
-        function recalcXPosition() {
-            // First try centered
-            var halfRootWidth   = _root.width / 2
-            var halfPanelWidth  = payloadControl.width / 2
-            var leftX           = (halfRootWidth - halfPanelWidth) - _toolsMargin
-            var rightX          = (halfRootWidth + halfPanelWidth) + _toolsMargin
-            if (leftX >= parentToolInsets.leftEdgeBottomInset || rightX <= parentToolInsets.rightEdgeBottomInset ) {
-                // It will fit in the horizontalCenter
-                return halfRootWidth - halfPanelWidth
-            } else {
-                // Anchor to left edge
-                return parentToolInsets.leftEdgeBottomInset + _toolsMargin
-            }
-        }
+    //     anchors.right:          parent.right
+    //     anchors.top:            payloadControl.bottom
 
-        ColumnLayout {
+    //     function recalcXPosition() {
+    //         // First try centered
+    //         var halfRootWidth   = _root.width / 2
+    //         var halfPanelWidth  = payloadControl.width / 2
+    //         var leftX           = (halfRootWidth - halfPanelWidth) - _toolsMargin
+    //         var rightX          = (halfRootWidth + halfPanelWidth) + _toolsMargin
+    //         if (leftX >= parentToolInsets.leftEdgeBottomInset || rightX <= parentToolInsets.rightEdgeBottomInset ) {
+    //             // It will fit in the horizontalCenter
+    //             return halfRootWidth - halfPanelWidth
+    //         } else {
+    //             // Anchor to left edge
+    //             return parentToolInsets.leftEdgeBottomInset + _toolsMargin
+    //         }
+    //     }
 
-            id:                     cameraControlColumnLayout
-            Layout.fillWidth:       true
-            anchors.centerIn:       parent
-            anchors.margins:            _toolsMargin
+    //     ColumnLayout {
 
-            RowLayout{
+    //         id:                     cameraControlColumnLayout
+    //         Layout.fillWidth:       true
+    //         anchors.centerIn:       parent
+    //         anchors.margins:            _toolsMargin
 
-                QGCLabel {
-                    text:                   "CAMERA CONTROL"
-                    color:                  _indicatorsColor
-                    font.pointSize:         ScreenTools.mediumFontPointSize
-                    Layout.fillWidth:       true
-                    Layout.minimumWidth:    indicatorValueWidth * 1.5
-                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
-                    horizontalAlignment:    Text.AlignHCenter
-                    padding:                ScreenTools.defaultFontPixelWidth
-                }
+    //         RowLayout{
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    enabled:        true
-                    visible:        true
-                }
-                QGCButton {
-                    id: btnRGB
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight * 0.8
-                    Layout.maximumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "RGB"
-                    checked:        true
-                    checkable:      true
-                    pointSize:      ScreenTools.smallFontPointSize
+    //             QGCLabel {
+    //                 text:                   "CAMERA CONTROL"
+    //                 color:                  _indicatorsColor
+    //                 font.pointSize:         ScreenTools.mediumFontPointSize
+    //                 Layout.fillWidth:       true
+    //                 Layout.minimumWidth:    indicatorValueWidth * 1.5
+    //                 Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+    //                 horizontalAlignment:    Text.AlignHCenter
+    //                 padding:                ScreenTools.defaultFontPixelWidth
+    //             }
 
-                    onClicked: {
-                        console.info("RGB")
-                        btnThermal.checked = false
-                        QGroundControl.multiVehicleManager.changeActiveVideoStream(false)
-                    }
-                }
-                QGCButton {
-                    id: btnThermal
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight * 0.8
-                    Layout.maximumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "TH"
-                    checkable:      true
-                    checked:        false
-                    pointSize:      ScreenTools.smallFontPointSize
+    //             Item {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 enabled:        true
+    //                 visible:        true
+    //             }
+    //             QGCButton {
+    //                 id: btnRGB
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight * 0.8
+    //                 Layout.maximumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "RGB"
+    //                 checked:        true
+    //                 checkable:      true
+    //                 pointSize:      ScreenTools.smallFontPointSize
 
-                    onClicked: {
-                        console.info("THERM")
-                        btnRGB.checked = false
-                        QGroundControl.multiVehicleManager.changeActiveVideoStream(true)
-                    }
-                }
-            }
+    //                 onClicked: {
+    //                     console.info("RGB")
+    //                     btnThermal.checked = false
+    //                     QGroundControl.multiVehicleManager.changeActiveVideoStream(false)
+    //                     windowRGB.show()
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 id: btnThermal
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight * 0.8
+    //                 Layout.maximumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "TH"
+    //                 checkable:      true
+    //                 checked:        false
+    //                 pointSize:      ScreenTools.smallFontPointSize
 
-            RowLayout {
-                Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
-                height:                 _indicatorsHeight * 3
+    //                 onClicked: {
+    //                     console.info("THERM")
+    //                     btnRGB.checked = false
+    //                     QGroundControl.multiVehicleManager.changeActiveVideoStream(true)
+    //                 }
+    //             }
+    //         }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
-                    visible:        true
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "FRONT"
-                    checked:        false
+    //         RowLayout {
+    //             Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+    //             height:                 _indicatorsHeight * 3
 
-                    onClicked: {
-                        console.info("FRONT")
-                        sendPanValue(getIP(_activeVehicle.id),"0")
-                    }
-                }
-                Item {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
-                    visible:        true
+    //             Item {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        true
+    //                 visible:        true
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "FRONT"
+    //                 checked:        false
 
-                }
-                Item {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        true
-                    visible:        true
+    //                 onClicked: {
+    //                     console.info("FRONT")
+    //                     sendPanValue(getIP(_activeVehicle.id),"0")
+    //                 }
+    //             }
+    //             Item {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        true
+    //                 visible:        true
 
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "UP"
-                    checked:        false
+    //             }
+    //             Item {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        true
+    //                 visible:        true
 
-                    onClicked: {
-                        console.info("UP")
-                        sendTiltValue(getIP(_activeVehicle.id),"20")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "-0-"
-                    checked:        false
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "UP"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info("Zero tilt")
-                        sendTiltValue(getIP(_activeVehicle.id),"0")
-                    }
-                }
-            }
-            RowLayout {
-                Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
-                height:                 _indicatorsHeight * 3
+    //                 onClicked: {
+    //                     console.info("UP")
+    //                     sendTiltValue(getIP(_activeVehicle.id),"20")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "-0-"
+    //                 checked:        false
 
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "LEFT"
-                    checked:        false
+    //                 onClicked: {
+    //                     console.info("Zero tilt")
+    //                     sendTiltValue(getIP(_activeVehicle.id),"0")
+    //                 }
+    //             }
+    //         }
+    //         RowLayout {
+    //             Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+    //             height:                 _indicatorsHeight * 3
 
-                    onClicked: {
-                        console.info("LEFT")
-                        sendPanValue(getIP(_activeVehicle.id),"-90")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "BACK"
-                    checked:        false
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "LEFT"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info("BACK")
-                        sendPanValue(getIP(_activeVehicle.id),"180")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "RIGHT"
-                    checked:        false
+    //                 onClicked: {
+    //                     console.info("LEFT")
+    //                     sendPanValue(getIP(_activeVehicle.id),"-90")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "BACK"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info("RIGHT")
-                        sendPanValue(getIP(_activeVehicle.id),"90")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "<<"
-                    checked:        false
+    //                 onClicked: {
+    //                     console.info("BACK")
+    //                     sendPanValue(getIP(_activeVehicle.id),"180")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "RIGHT"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info("<<")
-                        sendPanValue(getIP(_activeVehicle.id),"-30")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           "DOWN"
-                    checked:        false
+    //                 onClicked: {
+    //                     console.info("RIGHT")
+    //                     sendPanValue(getIP(_activeVehicle.id),"90")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "<<"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info("DOWN")
-                        sendTiltValue(getIP(_activeVehicle.id),"-20")
-                    }
-                }
-                QGCButton {
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: _indicatorsHeight
-                    Layout.minimumWidth: _indicatorsHeight
-                    Layout.maximumWidth: _rightPanelWidth / 6.5
-                    enabled:        _activeVehicle
-                    visible:        true
-                    text:           ">>"
-                    checked:        false
+    //                 onClicked: {
+    //                     console.info("<<")
+    //                     sendPanValue(getIP(_activeVehicle.id),"-30")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           "DOWN"
+    //                 checked:        false
 
-                    onClicked: {
-                        console.info(">>")
-                        sendPanValue(getIP(_activeVehicle.id),"30")
-                    }
-                }
-            }
-        }
-    }
+    //                 onClicked: {
+    //                     console.info("DOWN")
+    //                     sendTiltValue(getIP(_activeVehicle.id),"-20")
+    //                 }
+    //             }
+    //             QGCButton {
+    //                 Layout.fillWidth: true
+    //                 Layout.minimumHeight: _indicatorsHeight
+    //                 Layout.minimumWidth: _indicatorsHeight
+    //                 Layout.maximumWidth: _rightPanelWidth / 6.5
+    //                 enabled:        _activeVehicle
+    //                 visible:        true
+    //                 text:           ">>"
+    //                 checked:        false
+
+    //                 onClicked: {
+    //                     console.info(">>")
+    //                     sendPanValue(getIP(_activeVehicle.id),"30")
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }

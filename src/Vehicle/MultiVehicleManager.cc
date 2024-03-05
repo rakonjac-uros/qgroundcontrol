@@ -18,8 +18,6 @@
 #include "QGCCorePlugin.h"
 #include "QGCOptions.h"
 #include "LinkManager.h"
-#include <signal.h>
-#include <iostream>
 
 #if defined (__ios__) || defined(__android__)
 #include "MobileScreenMgr.h"
@@ -33,8 +31,6 @@ const char* MultiVehicleManager::_gcsHeartbeatEnabledKey = "gcsHeartbeatEnabled"
 
 MultiVehicleManager::MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbox)
     : QGCTool(app, toolbox)
-    , _isThermalVideoActive(false)
-    , _activePipelinePid(-1)
     , _activeVehicleAvailable(false)
     , _parameterReadyVehicleAvailable(false)
     , _activeVehicle(nullptr)
@@ -48,13 +44,6 @@ MultiVehicleManager::MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbo
     _gcsHeartbeatEnabled = settings.value(_gcsHeartbeatEnabledKey, true).toBool();
     _gcsHeartbeatTimer.setInterval(_gcsHeartbeatRateMSecs);
     _gcsHeartbeatTimer.setSingleShot(false);
-    connect(this, &MultiVehicleManager::activeVehicleChanged, this, &MultiVehicleManager::_changeVideoFeed);
-    signal(SIGCHLD, SIG_IGN);
-}
-
-MultiVehicleManager::~MultiVehicleManager()
-{
-    _stopVideoPipeline();
 }
 
 void MultiVehicleManager::setToolbox(QGCToolbox *toolbox)
@@ -353,12 +342,6 @@ QString MultiVehicleManager::loadSetting(const QString &name, const QString& def
     return settings.value(name, defaultValue).toString();
 }
 
-void MultiVehicleManager::changeActiveVideoStream(bool thermal)
-{
-    _isThermalVideoActive = thermal;
-    _changeVideoFeed(_activeVehicle);
-}
-
 Vehicle* MultiVehicleManager::getVehicleById(int vehicleId)
 {
     for (int i=0; i< _vehicles.count(); i++) {
@@ -414,97 +397,4 @@ void MultiVehicleManager::_sendGCSHeartbeat(void)
             link->writeBytesThreadSafe((const char*)buffer, len);
         }
     }
-}
-
-pid_t systemFork(const char *command, int *infp, int *outfp)
-{
-    int p_stdin[2];
-    int p_stdout[2];
-    pid_t pid;
-
-    if (pipe(p_stdin) == -1)
-        return -1;
-
-    if (pipe(p_stdout) == -1) {
-        close(p_stdin[0]);
-        close(p_stdin[1]);
-        return -1;
-    }
-
-    pid = fork();
-
-    if (pid < 0) {
-        close(p_stdin[0]);
-        close(p_stdin[1]);
-        close(p_stdout[0]);
-        close(p_stdout[1]);
-        return pid;
-    } else if (pid == 0) {
-        close(p_stdin[1]);
-        dup2(p_stdin[0], 0);
-        close(p_stdout[0]);
-        dup2(p_stdout[1], 1);
-        dup2(::open("/dev/null", O_RDONLY), 2);
-
-        setsid();
-        execl("/bin/bash", "bash", "-c", command, NULL);
-        exit(1);
-    }
-
-    close(p_stdin[0]);
-    close(p_stdout[1]);
-
-    if (infp == NULL) {
-        close(p_stdin[1]);
-    } else {
-        *infp = p_stdin[1];
-    }
-
-    if (outfp == NULL) {
-        close(p_stdout[0]);
-    } else {
-        *outfp = p_stdout[0];
-    }
-
-    return pid;
-}
-
-std::string MultiVehicleManager::_getVehicleIP(int vehicleId)
-{
-    std::string vehicleIP;
-    switch (vehicleId) {
-    case 1:
-        vehicleIP = "10.49.0.3";
-        break;
-    case 2:
-        vehicleIP = "10.49.0.4";
-        break;
-    case 3:
-        vehicleIP = "10.49.0.5";
-        break;
-    default:
-        vehicleIP = "10.49.0.2";
-        break;
-    }
-    return vehicleIP;
-}
-
-void MultiVehicleManager::_stopVideoPipeline()
-{
-    if (_activePipelinePid >= 0)
-    {
-        kill(_activePipelinePid, SIGKILL);
-        int killallReturn = system("killall ffmpeg");
-        std::cout << "killall command return value: " << killallReturn << std::endl;
-    }
-}
-
-void MultiVehicleManager::_changeVideoFeed(Vehicle *vehicle)
-{
-    // ffmpeg -i srt://10.49.0.5:8890?streamid=read:rgbwfov -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001
-    _stopVideoPipeline();
-    std::string ip_address = _getVehicleIP(vehicle->id());
-    std::string videoType = _isThermalVideoActive ? "twfov" : "rgbwfov";
-    std::string ffmpegCommand = "while true; do /usr/local/bin/ffmpeg -i \"srt://" + ip_address + ":8890?streamid=read:" + videoType + "&latency=900000\" -c:v copy -f rtp udp://127.0.0.1:5000?pkt_size=1316 -c:v copy -f mpegts udp://127.0.0.1:5001; sleep 1; done";
-    _activePipelinePid = systemFork(ffmpegCommand.c_str(), NULL, NULL);
 }
