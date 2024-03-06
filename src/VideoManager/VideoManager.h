@@ -45,8 +45,10 @@ public:
     Q_PROPERTY(QString          uvcVideoSourceID        READ    uvcVideoSourceID                            NOTIFY uvcVideoSourceIDChanged)
     Q_PROPERTY(bool             uvcEnabled              READ    uvcEnabled                                  CONSTANT)
     Q_PROPERTY(bool             fullScreen              READ    fullScreen      WRITE   setfullScreen       NOTIFY fullScreenChanged)
-    Q_PROPERTY(VideoReceiver*   videoReceiverRGB1           READ    videoReceiverRGB1                               CONSTANT)
-    Q_PROPERTY(VideoReceiver*   videoReceiverTh1    READ    videoReceiverTh1                        CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverRGB1       READ    videoReceiverRGB1                           CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverTh1        READ    videoReceiverTh1                            CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverRGB2       READ    videoReceiverRGB2                           CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverTh2        READ    videoReceiverTh2                            CONSTANT)
     Q_PROPERTY(double           aspectRatio             READ    aspectRatio                                 NOTIFY aspectRatioChanged)
     Q_PROPERTY(double           thermalAspectRatio      READ    thermalAspectRatio                          NOTIFY aspectRatioChanged)
     Q_PROPERTY(double           hfov                    READ    hfov                                        NOTIFY aspectRatioChanged)
@@ -112,6 +114,7 @@ public:
 
     Q_INVOKABLE void startVideo     ();
     Q_INVOKABLE void stopVideo      ();
+    Q_INVOKABLE void restartVideos  ();
 
     Q_INVOKABLE void startRecording (const QString& videoFile = QString());
     Q_INVOKABLE void stopRecording  ();

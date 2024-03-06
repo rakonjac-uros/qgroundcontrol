@@ -412,38 +412,40 @@ Item {
     signal windowAboutToOpen    // Catch this signal to do something special prior to the item transition to windowed mode
     signal windowAboutToClose   // Catch this signal to do special processing prior to the item transition back to pip mode
 
+    Connections {
+        target: multiVehicleList
+        onMessage: {
+            switch (id) {
+            case 2:
+                windowBravo.show()
+                break
+            case 3:
+                windowCharlie.show()
+                break
+            default:
+                break
+            }
+        }
+    }
 
     Window {
         id:         windowBravo
         title:      "BRAVO"
         visible:    true
-        width: parent.width /4
-        height: parent.height /4
+        width: parent.width / 3
+        height: parent.height / 3
 
         property int _vehicleID: 2
 
-        //-- Video 2
-        Rectangle {
-            anchors.fill: parent
-            // anchors.margins:        _toolsMargin
-            // anchors.right:          parent.right
-            // anchors.top: rgbItem.bottom
-            // width:                  _rightPanelWidth
-            // height: _rightPanelWidth*0.7
-            //width:              height * QGroundControl.videoManager.thermalAspectRatio
-            //height:             _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_FULL ? parent.height : (_camera.thermalMode === QGCCameraControl.THERMAL_PIP ? ScreenTools.defaultFontPixelHeight * 12 : parent.height * _thermalHeightFactor)) : 0
-            //anchors.centerIn:   parent
-            visible:            true //QGroundControl.videoManager.hasThermal && _camera.thermalMode !== QGCCameraControl.THERMAL_OFF
-
-            QGCVideoBackground {
-                id:             videoReceiverRGB1
-                objectName:     "videoReceiverRGB1"
-                anchors.fill:   parent
-                receiver:       QGroundControl.videoManager.videoReceiverRGB1
-                visible: btnBravoRGB.checked
-                //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
-            }
+        QGCVideoBackground {
+            id:             videoReceiverRGB1
+            objectName:     "videoReceiverRGB1"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.videoReceiverRGB1
+            visible: btnBravoRGB.checked
+            //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
         }
+
         QGCVideoBackground {
             id:             videoReceiverTh1
             objectName:     "videoReceiverTh1"
@@ -451,16 +453,6 @@ Item {
             receiver:       QGroundControl.videoManager.videoReceiverTh1
             visible: btnBravoTh.checked
             //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
-        }
-
-        Connections {
-            target: multiVehicleList
-            onMessage: {
-                if(id == 2) {
-                    windowBravo.show()
-                }
-                console.log(id)
-            }
         }
 
         Rectangle { // camera control
@@ -714,30 +706,16 @@ Item {
         id:         windowCharlie
         title:      "CHARLIE"
         visible:    true
-        width: parent.width /4
-        height: parent.height /4
+        width: parent.width / 3
+        height: parent.height / 3
 
-
-        Rectangle {
-            anchors.fill: parent
-            // anchors.margins:        _toolsMargin
-            // anchors.right:          parent.right
-            // anchors.top: rgbItem.bottom
-            // width:                  _rightPanelWidth
-            // height: _rightPanelWidth*0.7
-            //width:              height * QGroundControl.videoManager.thermalAspectRatio
-            //height:             _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_FULL ? parent.height : (_camera.thermalMode === QGCCameraControl.THERMAL_PIP ? ScreenTools.defaultFontPixelHeight * 12 : parent.height * _thermalHeightFactor)) : 0
-            //anchors.centerIn:   parent
-            visible:            true //QGroundControl.videoManager.hasThermal && _camera.thermalMode !== QGCCameraControl.THERMAL_OFF
-
-            QGCVideoBackground {
-                id:             videoReceiverRGB2
-                objectName:     "videoReceiverRGB2"
-                anchors.fill:   parent
-                receiver:       QGroundControl.videoManager.videoReceiverRGB2
-                visible:        btnCharlieRGB.checked
-                //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
-            }
+        QGCVideoBackground {
+            id:             videoReceiverRGB2
+            objectName:     "videoReceiverRGB2"
+            anchors.fill:   parent
+            receiver:       QGroundControl.videoManager.videoReceiverRGB2
+            visible:        btnCharlieRGB.checked
+            //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
         }
 
         QGCVideoBackground {
@@ -747,16 +725,6 @@ Item {
             receiver:       QGroundControl.videoManager.videoReceiverTh2
             visible:        btnCharlieTh.checked
             //opacity:        _camera ? (_camera.thermalMode === QGCCameraControl.THERMAL_BLEND ? _camera.thermalOpacity / 100 : 1.0) : 0
-        }
-
-        Connections {
-            target: multiVehicleList
-            onMessage: {
-                console.log(id)
-                if(id == 3) {
-                    windowCharlie.show()
-                }
-            }
         }
 
         Rectangle { // camera control
@@ -1208,6 +1176,7 @@ Item {
         width:                  vehicleStatusGrid.width  + (ScreenTools.defaultFontPixelWidth  * 10)//5
         height:                 vehicleStatusGrid.height + (ScreenTools.defaultFontPixelHeight * 1.5)//2.5
         radius:                 8
+        visible:                _activeVehicle
 
         anchors.top:    parent.top
         anchors.topMargin: ScreenTools.defaultFontPixelHeight * 1.3
@@ -1610,7 +1579,7 @@ Item {
         anchors.horizontalCenter:      parent.horizontalCenter
         //anchors.top:            vehicleIndicator.bottom
         //width:                  _rightPanelWidth
-
+        visible:                _activeVehicle
 
         function recalcXPosition() {
             // First try centered
