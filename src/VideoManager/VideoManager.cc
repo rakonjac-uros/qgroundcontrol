@@ -193,10 +193,10 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
     }
 
     // manual pipelines
-    _updateVideoUri(0, "udp://0.0.0.0:5021");
-    _updateVideoUri(1, "udp://0.0.0.0:5022");
-    _updateVideoUri(2, "udp://0.0.0.0:5031");
-    _updateVideoUri(3, "udp://0.0.0.0:5032");
+    _updateVideoUri(0, "udp265://0.0.0.0:5021");
+    _updateVideoUri(1, "udp265://0.0.0.0:5022");
+    _updateVideoUri(2, "udp265://0.0.0.0:5031");
+    _updateVideoUri(3, "udp265://0.0.0.0:5032");
 
     if(isGStreamer()) {
         startVideo();
