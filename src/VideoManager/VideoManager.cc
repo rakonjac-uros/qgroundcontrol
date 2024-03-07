@@ -318,6 +318,8 @@ VideoManager::startRecording(const QString& videoFile)
                  + (videoFile.isEmpty() ? QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss") : videoFile)
                  + ".";
     QString videoFile2 = _videoFile + "2." + ext;
+    QString videoFile3 = _videoFile + "3." + ext;
+    QString videoFile4 = _videoFile + "4." + ext;
     _videoFile += ext;
 
     if (_videoReceiver[0] && _videoStarted[0]) {
@@ -325,6 +327,12 @@ VideoManager::startRecording(const QString& videoFile)
     }
     if (_videoReceiver[1] && _videoStarted[1]) {
         _videoReceiver[1]->startRecording(videoFile2, fileFormat);
+    }
+    if (_videoReceiver[2] && _videoStarted[2]) {
+        _videoReceiver[2]->startRecording(videoFile3, fileFormat);
+    }
+    if (_videoReceiver[3] && _videoStarted[3]) {
+        _videoReceiver[3]->startRecording(videoFile4, fileFormat);
     }
 
 #else
@@ -340,7 +348,7 @@ VideoManager::stopRecording()
     }
 #if defined(QGC_GST_STREAMING)
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < USV_STREAM_COUNT; i++) {
         if (_videoReceiver[i]) {
             _videoReceiver[i]->stopRecording();
         }
@@ -501,7 +509,7 @@ VideoManager::_videoSourceChanged()
     emit isUvcChanged();
     emit isAutoStreamChanged();
     if (hasVideo()) {
-        _restartVideo(0);
+        _restartAllVideos();
     } else {
         stopVideo();
     }
@@ -511,21 +519,21 @@ VideoManager::_videoSourceChanged()
 void
 VideoManager::_udpPortChanged()
 {
-    _restartVideo(0);
+    _restartAllVideos();
 }
 
 //-----------------------------------------------------------------------------
 void
 VideoManager::_rtspUrlChanged()
 {
-    _restartVideo(0);
+    _restartAllVideos();
 }
 
 //-----------------------------------------------------------------------------
 void
 VideoManager::_tcpUrlChanged()
 {
-    _restartVideo(0);
+    _restartAllVideos();
 }
 
 //-----------------------------------------------------------------------------
@@ -871,7 +879,7 @@ VideoManager::_startReceiver(unsigned id)
        So we should allow for some negotiation time for rtsp */
     const unsigned timeout = (source == VideoSettings::videoSourceRTSP ? rtsptimeout : 2 );
 
-    if (id > 1) {
+    if (id >= USV_STREAM_COUNT) {
         qCDebug(VideoManagerLog) << "Unsupported receiver id" << id;
     } else if (_videoReceiver[id] != nullptr/* && _videoSink[id] != nullptr*/) {
         if (!_videoUri[id].isEmpty()) {
@@ -888,7 +896,7 @@ void
 VideoManager::_stopReceiver(unsigned id)
 {
 #if defined(QGC_GST_STREAMING)
-    if (id > 1) {
+    if (id >= USV_STREAM_COUNT) {
         qCDebug(VideoManagerLog) << "Unsupported receiver id" << id;
     } else if (_videoReceiver[id] != nullptr) {
         _videoReceiver[id]->stop();

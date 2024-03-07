@@ -396,7 +396,7 @@ Item {
     FlyViewInstrumentPanel {
         id:                         instrumentPanel
         anchors.margins:            _toolsMargin
-        anchors.topMargin: ScreenTools.defaultFontPixelHeight * 1.3
+        anchors.topMargin: ScreenTools.defaultFontPixelHeight * 2.5
         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
         anchors.right:              parent.right
         width:                      _rightPanelWidth
@@ -408,6 +408,28 @@ Item {
         property real topEdgeRightInset: visible ? y + height : 0
     }
 
+    QGCButton {
+        anchors.margins:    _toolsMargin
+        anchors.top:        parent.top
+        anchors.right:      parent.right
+        width:              _rightPanelWidth
+        spacing:            ScreenTools.defaultFontPixelWidth
+        visible:            QGroundControl.multiVehicleManager.vehicles.count == 1 //&& QGroundControl.corePlugin.options.flyView.showMultiVehicleList
+        text:       qsTr("VIDEO")
+        onClicked: {
+                switch (_activeVehicle.id) {
+                case 2:
+                    windowBravo.show()
+                    break
+                case 3:
+                    windowCharlie.show()
+                    break
+                default:
+                    console.warn("Unsupported system ID: ", _activeVehicle.id)
+                    break
+                }
+            }
+    }
 
     signal windowAboutToOpen    // Catch this signal to do something special prior to the item transition to windowed mode
     signal windowAboutToClose   // Catch this signal to do special processing prior to the item transition back to pip mode
