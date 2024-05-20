@@ -58,10 +58,10 @@ QGCComboBox {
         currentIndex = newCurrentIndex
     }
 
-    onActivated: {
-        var vehicleId = textAt(index).split(" ")[1]
-        var vehicle = QGroundControl.multiVehicleManager.getVehicleById(vehicleId)
-        QGroundControl.multiVehicleManager.activeVehicle = vehicle
-    }
+    // onActivated: {
+    //     var vehicleId = textAt(index).split(" ")[1]
+    //     var vehicle = QGroundControl.multiVehicleManager.getVehicleById(vehicleId)
+    //     QGroundControl.multiVehicleManager.activeVehicle = vehicle
+    // }
 }
 

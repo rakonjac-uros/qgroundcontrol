@@ -38,11 +38,13 @@ Item {
 
     property double _thermalHeightFactor: 0.85 //-- TODO
 
-        Image {
+        Rectangle {
             id:             noVideo
             anchors.fill:   parent
-            source:         "/res/NoVideoBackground.jpg"
-            fillMode:       Image.PreserveAspectCrop
+            color: "black"
+            opacity: 0.5
+            //source:         "/res/NoVideoBackground.jpg"
+            //fillMode:       Image.PreserveAspectCrop
             visible:        !(QGroundControl.videoManager.decoding)
 
             Rectangle {

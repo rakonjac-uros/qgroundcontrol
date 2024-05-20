@@ -24,6 +24,8 @@
 
 Q_DECLARE_LOGGING_CATEGORY(VideoManagerLog)
 
+#define USV_STREAM_COUNT 4
+
 class VideoSettings;
 class Vehicle;
 class Joystick;
@@ -43,8 +45,10 @@ public:
     Q_PROPERTY(QString          uvcVideoSourceID        READ    uvcVideoSourceID                            NOTIFY uvcVideoSourceIDChanged)
     Q_PROPERTY(bool             uvcEnabled              READ    uvcEnabled                                  CONSTANT)
     Q_PROPERTY(bool             fullScreen              READ    fullScreen      WRITE   setfullScreen       NOTIFY fullScreenChanged)
-    Q_PROPERTY(VideoReceiver*   videoReceiver           READ    videoReceiver                               CONSTANT)
-    Q_PROPERTY(VideoReceiver*   thermalVideoReceiver    READ    thermalVideoReceiver                        CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverRGB1       READ    videoReceiverRGB1                           CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverTh1        READ    videoReceiverTh1                            CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverRGB2       READ    videoReceiverRGB2                           CONSTANT)
+    Q_PROPERTY(VideoReceiver*   videoReceiverTh2        READ    videoReceiverTh2                            CONSTANT)
     Q_PROPERTY(double           aspectRatio             READ    aspectRatio                                 NOTIFY aspectRatioChanged)
     Q_PROPERTY(double           thermalAspectRatio      READ    thermalAspectRatio                          NOTIFY aspectRatioChanged)
     Q_PROPERTY(double           hfov                    READ    hfov                                        NOTIFY aspectRatioChanged)
@@ -90,8 +94,11 @@ public:
 
 // FIXME: AV: they should be removed after finishing multiple video stream support
 // new arcitecture does not assume direct access to video receiver from QML side, even if it works for now
-    virtual VideoReceiver*  videoReceiver           () { return _videoReceiver[0]; }
-    virtual VideoReceiver*  thermalVideoReceiver    () { return _videoReceiver[1]; }
+    virtual VideoReceiver*  videoReceiverRGB1   () { return _videoReceiver[0]; }
+    virtual VideoReceiver*  videoReceiverTh1    () { return _videoReceiver[1]; }
+    virtual VideoReceiver*  videoReceiverRGB2   () { return _videoReceiver[2]; }
+    virtual VideoReceiver*  videoReceiverTh2    () { return _videoReceiver[3]; }
+
 
 #if defined(QGC_DISABLE_UVC)
     virtual bool        uvcEnabled          () { return false; }
@@ -107,6 +114,7 @@ public:
 
     Q_INVOKABLE void startVideo     ();
     Q_INVOKABLE void stopVideo      ();
+    Q_INVOKABLE void restartVideos  ();
 
     Q_INVOKABLE void startRecording (const QString& videoFile = QString());
     Q_INVOKABLE void stopRecording  ();
@@ -158,16 +166,16 @@ protected:
     QString                 _imageFile;
     SubtitleWriter          _subtitleWriter;
     bool                    _isTaisync              = false;
-    VideoReceiver*          _videoReceiver[2]       = { nullptr, nullptr };
-    void*                   _videoSink[2]           = { nullptr, nullptr };
-    QString                 _videoUri[2];
+    VideoReceiver*          _videoReceiver[USV_STREAM_COUNT]       = { nullptr, nullptr, nullptr, nullptr };
+    void*                   _videoSink[USV_STREAM_COUNT]           = { nullptr, nullptr, nullptr, nullptr };
+    QString                 _videoUri[USV_STREAM_COUNT];
     // FIXME: AV: _videoStarted seems to be access from 3 different threads, from time to time
     // 1) Video Receiver thread
     // 2) Video Manager/main app thread
     // 3) Qt rendering thread (during video sink creation process which should happen in this thread)
     // It works for now but...
-    bool                    _videoStarted[2]        = { false, false };
-    bool                    _lowLatencyStreaming[2] = { false, false };
+    bool                    _videoStarted[USV_STREAM_COUNT]        = { false, false, false, false };
+    bool                    _lowLatencyStreaming[USV_STREAM_COUNT] = { false, false, false, false };
     QAtomicInteger<bool>    _streaming              = false;
     QAtomicInteger<bool>    _decoding               = false;
     QAtomicInteger<bool>    _recording              = false;

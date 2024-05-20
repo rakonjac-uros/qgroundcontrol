@@ -209,7 +209,6 @@
 		<file alias="QGroundControl/FlightDisplay/FlyViewMissionCompleteDialog.qml">../src/FlightDisplay/FlyViewMissionCompleteDialog.qml</file>
 		<file alias="QGroundControl/FlightDisplay/FlyViewPreFlightChecklistPopup.qml">../src/FlightDisplay/FlyViewPreFlightChecklistPopup.qml</file>
 		<file alias="QGroundControl/FlightDisplay/FlyViewToolStripActionList.qml">../src/FlightDisplay/FlyViewToolStripActionList.qml</file>
-		<file alias="QGroundControl/FlightDisplay/FlyViewVideo.qml">../src/FlightDisplay/FlyViewVideo.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionActionList.qml">../src/FlightDisplay/GuidedActionActionList.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionConfirm.qml">../src/FlightDisplay/GuidedActionConfirm.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedActionsController.qml">../src/FlightDisplay/GuidedActionsController.qml</file>
@@ -222,7 +221,6 @@
 		<file alias="QGroundControl/FlightDisplay/GuidedActionRTL.qml">../src/FlightDisplay/GuidedActionRTL.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedValueSlider.qml">../src/FlightDisplay/GuidedValueSlider.qml</file>
 		<file alias="QGroundControl/FlightDisplay/GuidedToolStripAction.qml">../src/FlightDisplay/GuidedToolStripAction.qml</file>
-		<file alias="QGroundControl/FlightDisplay/MultiVehicleList.qml">../src/FlightDisplay/MultiVehicleList.qml</file>
 		<file alias="QGroundControl/FlightDisplay/PreFlightBatteryCheck.qml">../src/FlightDisplay/PreFlightBatteryCheck.qml</file>
 		<file alias="QGroundControl/FlightDisplay/PreFlightGPSCheck.qml">../src/FlightDisplay/PreFlightGPSCheck.qml</file>
 		<file alias="QGroundControl/FlightDisplay/PreFlightRCCheck.qml">../src/FlightDisplay/PreFlightRCCheck.qml</file>

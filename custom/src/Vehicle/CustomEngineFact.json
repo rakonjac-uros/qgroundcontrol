@@ -41,7 +41,7 @@
     {
         "name":             "chan3",
         "shortDescription": "Channel 3",
-        "type":             "int",
+        "type":             "uint16",
         "units":            "%"
     }
 ]

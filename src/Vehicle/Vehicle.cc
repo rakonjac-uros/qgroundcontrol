@@ -1562,10 +1562,10 @@ void Vehicle::_updateArmed(bool armed)
             _trajectoryPoints->stop();
             _flightTimerStop();
             // Also handle Video Streaming
-            if(qgcApp()->toolbox()->videoManager()->videoReceiver()) {
+            if(qgcApp()->toolbox()->videoManager()->videoReceiverRGB1()) {
                 if(_settingsManager->videoSettings()->disableWhenDisarmed()->rawValue().toBool()) {
                     _settingsManager->videoSettings()->streamEnabled()->setRawValue(false);
-                    qgcApp()->toolbox()->videoManager()->videoReceiver()->stop();
+                    qgcApp()->toolbox()->videoManager()->videoReceiverRGB1()->stop();
                 }
             }
         }
@@ -1894,16 +1894,22 @@ void Vehicle::_handleRCChannels(mavlink_message_t& message)
             pwmValues[i] = -1;
         }
     }
+
     float percent;
     if (channels.chan3_raw <= 1500)
     {
         percent = 0;
+    }
+    else if (channels.chan3_raw > 2000)
+    {
+        percent = 100;
     }
     else
     {
         percent = (channels.chan3_raw - 1500) / 5;
     }
     _engineFactGroup.chan3()->setRawValue((uint16_t)percent);
+
     emit remoteControlRSSIChanged(channels.rssi);
     emit rcChannelsChanged(channels.chancount, pwmValues);
 }
